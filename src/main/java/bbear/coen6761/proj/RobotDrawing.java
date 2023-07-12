@@ -2,12 +2,12 @@ package bbear.coen6761.proj;
 import javax.swing.*;
 
 public class RobotDrawing {
-    private static int N = 10; // Size of the floor
+    private static int N; // Size of the floor
 
     private static int[][] floor; // The floor array
     private static int[] position; // Robot's initial position [row, col]
     private static boolean penDown; // Robot's pen status
-    private static String direction = "S"; // Robot's initial direction
+    private static String direction; // Robot's initial direction
     private static boolean firstMove; // Added variable
     
     private static JTextArea outputArea;
@@ -35,7 +35,7 @@ public class RobotDrawing {
             inputField.setText("");
             
             outputArea.append("CMD: "+command + "\n");
-            printFloor(outputArea);
+//            printFloor(outputArea);
 
         });
         mainPanel.add(inputField);
@@ -77,7 +77,24 @@ public class RobotDrawing {
 		else if (command.toLowerCase().equals("c")) {
 	        // Print current position, pen status and direction
 	        String penStatus = penDown ? "down" : "up";
-	        String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[0], position[1], penStatus, direction.toLowerCase());
+	        String directionFull;
+	        switch (direction) {
+	            case "N":
+	                directionFull = "North";
+	                break;
+	            case "S":
+	                directionFull = "South";
+	                break;
+	            case "E":
+	                directionFull = "East";
+	                break;
+	            case "W":
+	                directionFull = "West";
+	                break;
+	            default:
+	                directionFull = "Invalid Direction";
+	        }
+	        String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[0], position[1], penStatus,directionFull);
 	        outputArea.append(formattedPosition + "\n");
 		}
 		else if (command.toLowerCase().equals("q")) {
