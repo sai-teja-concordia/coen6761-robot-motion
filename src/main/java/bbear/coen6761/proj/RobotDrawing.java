@@ -2,12 +2,15 @@ package bbear.coen6761.proj;
 import javax.swing.*;
 
 public class RobotDrawing {
-    private static final int N = 10; // Size of the floor
+    private static int N = 10; // Size of the floor
 
-    private static int[][] floor = new int[N][N]; // The floor array
-    private static int[] position = {0, 0}; // Robot's initial position [row, col]
-    private static boolean penDown = true; // Robot's pen status
+    private static int[][] floor; // The floor array
+    private static int[] position; // Robot's initial position [row, col]
+    private static boolean penDown; // Robot's pen status
     private static String direction = "S"; // Robot's initial direction
+    private static boolean firstMove; // Added variable
+    
+    private static JTextArea outputArea;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> createAndShowGUI());
@@ -19,19 +22,21 @@ public class RobotDrawing {
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-
-        JTextArea outputArea = new JTextArea(10, 30);
+        
+        outputArea = new JTextArea(20, 50);
         outputArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputArea);
         mainPanel.add(scrollPane);
 
-        JTextField inputField = new JTextField(20);
+        JTextField inputField = new JTextField(50);
         inputField.addActionListener(e -> {
             String command = inputField.getText();
             processCommand(command);
             inputField.setText("");
-            outputArea.append(command + "\n");
+            
+            outputArea.append("CMD: "+command + "\n");
             printFloor(outputArea);
+
         });
         mainPanel.add(inputField);
 
@@ -41,35 +46,76 @@ public class RobotDrawing {
     }
 
     private static void processCommand(String command) {
-        if (command.startsWith("move")) {
-            String[] parts = command.split(" ");
-            if (parts.length == 2) {
-                try {
-                    int steps = Integer.parseInt(parts[1]);
-                    move(steps);
-                } catch (NumberFormatException e) {
-                    System.err.println("Invalid move command: " + command);
-                }
-            } else {
-                System.err.println("Invalid move command: " + command);
-            }
-        } else if (command.equals("right")) {
-            turnRight();
-        } else if (command.equals("left")) {
-            turnLeft();
-        }
+	    if (command.toLowerCase().equals("u")) {
+	    	penDown = false;
+	    }
+	    else if (command.toLowerCase().equals("d")) {
+	    	penDown = true;
+	    }
+		else if (command.toLowerCase().equals("r")) {
+			turnRight();
+		}
+		else if (command.toLowerCase().equals("l")) {
+			turnLeft();
+		}
+		else if (command.toLowerCase().startsWith("m")) {
+			String[] parts = command.split(" ");
+			if (parts.length == 2) {
+				try {
+					int steps = Integer.parseInt(parts[1]);
+	                move(steps);
+	            } catch (NumberFormatException e) {
+	                System.err.println("Exception: " + e.getMessage());
+	            }
+			} else {
+	                System.err.println("Invalid move command: " + command);
+	        }
+		}
+		else if (command.toLowerCase().equals("p")) {
+            printFloor(outputArea);
+		}
+		else if (command.toLowerCase().equals("c")) {
+	        // Print current position, pen status and direction
+	        String penStatus = penDown ? "down" : "up";
+	        String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[0], position[1], penStatus, direction.toLowerCase());
+	        outputArea.append(formattedPosition + "\n");
+		}
+		else if (command.toLowerCase().equals("q")) {
+			// stop the program
+			System.exit(0);
+		}
+		else if (command.toLowerCase().startsWith("i")) {
+		    String[] parts = command.split(" ");
+		    if (parts.length == 2) {
+		        try {
+		            // n is the size of the array
+		            int size = Integer.parseInt(parts[1]);
+		            initializeSystem(size);
+		        } catch (NumberFormatException e) {
+		            System.err.println("Exception: " + e.getMessage());
+		        }
+		    } else {
+		        System.err.println("Invalid command: " + command);
+		    }
+		}
     }
 
     // Move the robot forward a given number of steps
     private static void move(int steps) {
         for (int i = 0; i < steps; i++) {
-            if (direction.equals("N")) {
-                if (position[0] > 0) {
-                    position[0]--;
-                }
-            } else if (direction.equals("S")) {
+        	if (firstMove && penDown) {
+                 floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
+                 firstMove = false; // Reset the flag
+                 continue; // Skip to the next loop iteration
+            }
+            
+        	if (direction.equals("N")) {
                 if (position[0] < N - 1) {
                     position[0]++;
+                }
+            } else if (direction.equals("S")) {
+                if (position[0] > 0) {
+                    position[0]--;
                 }
             } else if (direction.equals("W")) {
                 if (position[1] > 0) {
@@ -80,6 +126,7 @@ public class RobotDrawing {
                     position[1]++;
                 }
             }
+            
             if (penDown) {
                 floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
             }
@@ -114,19 +161,44 @@ public class RobotDrawing {
 
     // Print the floor with the drawing
     private static void printFloor(JTextArea outputArea) {
-        StringBuilder sb = new StringBuilder();
-        for (int[] row : floor) {
-            for (int cell : row) {
-                if (cell == 1) {
-                    sb.append("*");
-                } else {
-                    sb.append(" ");
-                }
-            }
-            sb.append("\n");
-        }
-        sb.append("\n");
-        outputArea.append(sb.toString());
+    	 StringBuilder sb = new StringBuilder();
+    	    // Start from the last row to flip the vertical axis
+    	    for (int i = N - 1; i >= 0; i--) {
+    	        sb.append(i).append(" "); // Print row index
+    	        for (int j = 0; j < N; j++) {
+    	            if (floor[i][j] == 1) {
+    	                sb.append("* ");
+    	            } else {
+    	                sb.append("  ");
+    	            }
+    	        }
+    	        sb.append("\n");
+    	    }
+    	    // Print column indexes
+    	    sb.append("  "); // Offset for row indexes
+    	    for (int i = 0; i < N; i++) {
+    	        sb.append(i).append(" ");
+    	    }
+    	    sb.append("\n");
+    	    outputArea.append(sb.toString());
+    }
+    
+    private static void initializeSystem(int size) {
+        // Initialize size of the floor
+        N = size;
+
+        // Initialize the floor array
+        floor = new int[N][N];
+
+        // Initialize robot's position
+        position = new int[] {0, 0};
+        firstMove = true;
+
+        // Lift the pen up
+        penDown = false;
+
+        // Initialize robot's direction facing North
+        direction = "N";
     }
 }
 
