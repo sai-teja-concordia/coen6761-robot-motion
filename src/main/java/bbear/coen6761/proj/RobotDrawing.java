@@ -46,10 +46,10 @@ public class RobotDrawing {
 
     public void processCommand(String command) {
 	    if (command.toLowerCase().equals("u")) {
-	    	penDown = false;
+	    	setPenDown(false);
 	    }
 	    else if (command.toLowerCase().equals("d")) {
-	    	penDown = true;
+	    	setPenDown(true);
 	    }
 		else if (command.toLowerCase().equals("r")) {
 			turnRight();
@@ -133,7 +133,6 @@ public class RobotDrawing {
 	        if (firstMove && penDown) {
 	             floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
 	             firstMove = false; // Reset the flag
-	             continue; // Skip to the next loop iteration
 	        }
 	        
 	        if (direction.equals("N")) {
@@ -251,6 +250,10 @@ public class RobotDrawing {
 
 	public boolean isFirstMove() {
 		return firstMove;
+	}
+	
+	public void setPenDown(boolean penDown) {
+		this.penDown = penDown;
 	}
 
 	public JTextArea getOutputArea() {

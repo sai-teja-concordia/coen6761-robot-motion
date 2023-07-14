@@ -2,6 +2,8 @@ package bbear.coen6761.proj.testing;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import javax.swing.JTextArea;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import bbear.coen6761.proj.RobotDrawing;
@@ -49,8 +51,25 @@ public class RobotDrawingTest {
         assertArrayEquals(new int[]{0, 3}, rb.getPosition());
         // Here we might want to also test that floor was marked
     }
-	
-    // p
+    
+	//p
+    @Test
+    public void testPrintFloor() {
+    	rb.setPenDown(true);
+    	rb.move(2);	
+        JTextArea outputArea = new JTextArea(20, 50);
+        rb.printFloor(outputArea);
+        String expectedOutput = 
+            "4        \n" +
+            "3        \n" +
+            "2 *      \n" +
+            "1 *      \n" +
+            "0        \n" +
+            "  0 1 2 3 4 \n";
+        assertEquals(expectedOutput, outputArea.getText());
+    }
+    
+    // c
     @Test
     public void testPrintCurrentPosition() {
     	
