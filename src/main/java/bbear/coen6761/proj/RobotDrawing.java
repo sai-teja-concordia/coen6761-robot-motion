@@ -8,7 +8,8 @@ public class RobotDrawing {
     private boolean penDown; // Robot's pen status
     private String direction; // Robot's initial direction
     private boolean firstMove; // Added variable
-    private JTextArea outputArea;
+    private JTextArea outputArea = new JTextArea(20, 50);
+    private boolean initialized = false;
 
     public static void main(String[] args) {
     	RobotDrawing rd = new RobotDrawing();
@@ -22,7 +23,7 @@ public class RobotDrawing {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         
-        outputArea = new JTextArea(20, 50);
+//        outputArea = new JTextArea(20, 50);
         outputArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputArea);
         mainPanel.add(scrollPane);
@@ -45,6 +46,11 @@ public class RobotDrawing {
     }
 
     public void processCommand(String command) {
+    	
+    	if (!initialized && !command.toLowerCase().startsWith("i")) {
+            outputArea.append("Error: System not initialized. Please initialize the system using the 'i' command before executing any other commands.\n");
+            return;
+        }
 	    if (command.toLowerCase().equals("u")) {
 	    	setPenDown(false);
 	    }
@@ -100,7 +106,7 @@ public class RobotDrawing {
 		}
     }
 
-	private void printCurrentPosition() {
+	public void printCurrentPosition() {
 		// Print current position, pen status and direction
 		String penStatus = penDown ? "down" : "up";
 		String directionFull;
@@ -131,7 +137,7 @@ public class RobotDrawing {
 	        int[] nextPosition = new int[]{position[0], position[1]};
 	        
 	        if (firstMove && penDown) {
-	             floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
+	             floor[position[0]][position[1]] = 1; 
 	             firstMove = false; // Reset the flag
 	        }
 	        
@@ -226,6 +232,9 @@ public class RobotDrawing {
 
         // Initialize robot's direction facing North
         direction = "N";
+        
+        // System is initialized
+        initialized = true;
     }
 
 	public int getN() {
@@ -258,7 +267,10 @@ public class RobotDrawing {
 
 	public JTextArea getOutputArea() {
 		return outputArea;
-	}  
-    
+	} 
+	
+	public boolean isInitialized() {
+        return initialized;
+    }
 }
 

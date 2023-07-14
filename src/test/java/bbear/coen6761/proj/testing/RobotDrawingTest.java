@@ -17,62 +17,76 @@ public class RobotDrawingTest {
 		rb.initializeSystem(5);
 	}
 	
-	// u
-	@Test
-	public void testPenUp() {
-	}
-	
 	// d
 	@Test
 	public void testPenDown() {
-		
+		rb.processCommand("d");
+		assertTrue(rb.isPenDown());
+		rb.processCommand("D");
+		assertTrue(rb.isPenDown());
 	}
 	
+	// u
+	@Test
+	public void testPenUp() {
+		rb.processCommand("u");
+		assertFalse(rb.isPenDown());
+		rb.processCommand("U");
+		assertFalse(rb.isPenDown());
+	}
 	
 	// r
 	@Test
 	public void testTurnRight() {
-        rb.turnRight();
+        rb.processCommand("r");
         assertEquals("E", rb.getDirection());
+        rb.processCommand("R");;
+        assertEquals("S", rb.getDirection());
 	}
 	
 	// l
 	@Test
 	public void testTurnLeft() {
-        rb.turnLeft();
+        rb.processCommand("l");
         assertEquals("W", rb.getDirection());
+        rb.processCommand("L");;
+        assertEquals("S", rb.getDirection());
 	}
 	
-	// m 3
+	// m s
     @Test
     public void testMove() {
-        rb.processCommand("d");
-        rb.move(3);
-        assertArrayEquals(new int[]{0, 3}, rb.getPosition());
+        rb.processCommand("m 3");
+        assertArrayEquals(new int[]{3, 0}, rb.getPosition());
+        assertThrows(IllegalArgumentException.class, ()-> rb.processCommand("M 6"));
         // Here we might want to also test that floor was marked
     }
     
-	//p
+	// p
     @Test
     public void testPrintFloor() {
-    	rb.setPenDown(true);
-    	rb.move(2);	
-        JTextArea outputArea = new JTextArea(20, 50);
-        rb.printFloor(outputArea);
+    	rb.processCommand("d");
+    	rb.processCommand("m 2");	
+        rb.printFloor(rb.getOutputArea());
         String expectedOutput = 
-            "4        \n" +
-            "3        \n" +
-            "2 *      \n" +
-            "1 *      \n" +
-            "0        \n" +
+            "4           \n" +
+            "3           \n" +
+            "2 *         \n" +
+            "1 *         \n" +
+            "0 *         \n" +
             "  0 1 2 3 4 \n";
-        assertEquals(expectedOutput, outputArea.getText());
+        assertEquals(expectedOutput, rb.getOutputArea().getText());
     }
     
     // c
     @Test
     public void testPrintCurrentPosition() {
-    	
+    	rb.processCommand("r");
+    	rb.processCommand("m 2");	
+    	rb.printCurrentPosition();
+         // setting the outputArea
+    	String expectedOutput = "Position: 0, 2 - Pen: up - Facing: East\n";
+    	assertEquals(expectedOutput, rb.getOutputArea().getText());
     }
     
     // q
@@ -84,7 +98,13 @@ public class RobotDrawingTest {
 	// i 10
     @Test
     public void testInitializeSystem() {
-        rb.initializeSystem(10);
+        rb.processCommand("i 10");
+        assertEquals(10, rb.getN());
+        assertNotNull(rb.getFloor());
+        assertNotNull(rb.getPosition());
+        assertFalse(rb.isPenDown());
+        assertEquals("N", rb.getDirection());
+        rb.processCommand("i 0");
         assertEquals(10, rb.getN());
         assertNotNull(rb.getFloor());
         assertNotNull(rb.getPosition());
