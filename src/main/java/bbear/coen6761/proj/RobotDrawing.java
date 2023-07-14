@@ -2,21 +2,20 @@ package bbear.coen6761.proj;
 import javax.swing.*;
 
 public class RobotDrawing {
-    private static int N; // Size of the floor
-
-    private static int[][] floor; // The floor array
-    private static int[] position; // Robot's initial position [row, col]
-    private static boolean penDown; // Robot's pen status
-    private static String direction; // Robot's initial direction
-    private static boolean firstMove; // Added variable
-    
-    private static JTextArea outputArea;
+    private int N; // Size of the floor
+    private int[][] floor; // The floor array
+    private int[] position; // Robot's initial position [row, col]
+    private boolean penDown; // Robot's pen status
+    private String direction; // Robot's initial direction
+    private boolean firstMove; // Added variable
+    private JTextArea outputArea;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> createAndShowGUI());
+    	RobotDrawing rd = new RobotDrawing();
+        SwingUtilities.invokeLater(() -> rd.createAndShowGUI());
     }
 
-    private static void createAndShowGUI() {
+    public void createAndShowGUI() {
         JFrame frame = new JFrame("Robot Drawing");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -45,7 +44,7 @@ public class RobotDrawing {
         frame.setVisible(true);
     }
 
-    private static void processCommand(String command) {
+    public void processCommand(String command) {
 	    if (command.toLowerCase().equals("u")) {
 	    	penDown = false;
 	    }
@@ -61,12 +60,14 @@ public class RobotDrawing {
 		else if (command.toLowerCase().startsWith("m")) {
 			String[] parts = command.split(" ");
 			if (parts.length == 2) {
-				try {
-					int steps = Integer.parseInt(parts[1]);
-	                move(steps);
-	            } catch (NumberFormatException e) {
-	                System.err.println("Exception: " + e.getMessage());
-	            }
+				 try {
+		                int steps = Integer.parseInt(parts[1]);
+		                move(steps);
+		            } catch (NumberFormatException e) {
+		                System.err.println("Exception: " + e.getMessage());
+		            } catch (IllegalArgumentException e) {
+		                outputArea.append(e.getMessage() + "\n");
+		          }
 			} else {
 	                System.err.println("Invalid move command: " + command);
 	        }
@@ -75,27 +76,7 @@ public class RobotDrawing {
             printFloor(outputArea);
 		}
 		else if (command.toLowerCase().equals("c")) {
-	        // Print current position, pen status and direction
-	        String penStatus = penDown ? "down" : "up";
-	        String directionFull;
-	        switch (direction) {
-	            case "N":
-	                directionFull = "North";
-	                break;
-	            case "S":
-	                directionFull = "South";
-	                break;
-	            case "E":
-	                directionFull = "East";
-	                break;
-	            case "W":
-	                directionFull = "West";
-	                break;
-	            default:
-	                directionFull = "Invalid Direction";
-	        }
-	        String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[0], position[1], penStatus,directionFull);
-	        outputArea.append(formattedPosition + "\n");
+	        printCurrentPosition();
 		}
 		else if (command.toLowerCase().equals("q")) {
 			// stop the program
@@ -110,48 +91,78 @@ public class RobotDrawing {
 		            initializeSystem(size);
 		        } catch (NumberFormatException e) {
 		            System.err.println("Exception: " + e.getMessage());
-		        }
+		        } catch (IllegalArgumentException e) {
+	                outputArea.append(e.getMessage() + "\n");
+	            }
 		    } else {
 		        System.err.println("Invalid command: " + command);
 		    }
 		}
     }
 
+	private void printCurrentPosition() {
+		// Print current position, pen status and direction
+		String penStatus = penDown ? "down" : "up";
+		String directionFull;
+		switch (direction) {
+		    case "N":
+		        directionFull = "North";
+		        break;
+		    case "S":
+		        directionFull = "South";
+		        break;
+		    case "E":
+		        directionFull = "East";
+		        break;
+		    case "W":
+		        directionFull = "West";
+		        break;
+		    default:
+		        directionFull = "Invalid Direction";
+		}
+		String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[0], position[1], penStatus,directionFull);
+		outputArea.append(formattedPosition + "\n");
+	}
+
     // Move the robot forward a given number of steps
-    private static void move(int steps) {
-        for (int i = 0; i < steps; i++) {
-        	if (firstMove && penDown) {
-                 floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
-                 firstMove = false; // Reset the flag
-                 continue; // Skip to the next loop iteration
-            }
-            
-        	if (direction.equals("N")) {
-                if (position[0] < N - 1) {
-                    position[0]++;
-                }
-            } else if (direction.equals("S")) {
-                if (position[0] > 0) {
-                    position[0]--;
-                }
-            } else if (direction.equals("W")) {
-                if (position[1] > 0) {
-                    position[1]--;
-                }
-            } else if (direction.equals("E")) {
-                if (position[1] < N - 1) {
-                    position[1]++;
-                }
-            }
-            
-            if (penDown) {
-                floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
-            }
-        }
-    }
+	public void move(int steps) throws IllegalArgumentException {
+	    for (int i = 0; i < steps; i++) {
+	        // Store next position
+	        int[] nextPosition = new int[]{position[0], position[1]};
+	        
+	        if (firstMove && penDown) {
+	             floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
+	             firstMove = false; // Reset the flag
+	             continue; // Skip to the next loop iteration
+	        }
+	        
+	        if (direction.equals("N")) {
+	            nextPosition[0]++;
+	        } else if (direction.equals("S")) {
+	            nextPosition[0]--;
+	        } else if (direction.equals("W")) {
+	            nextPosition[1]--;
+	        } else if (direction.equals("E")) {
+	            nextPosition[1]++;
+	        }
+
+	        // Check if next position is valid
+	        if (nextPosition[0] < 0 || nextPosition[0] >= N || nextPosition[1] < 0 || nextPosition[1] >= N) {
+	            throw new IllegalArgumentException("Robot can't move out of the board!");
+	        }
+
+	        // Update position
+	        position = nextPosition;
+
+	        if (penDown) {
+	            floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
+	        }
+	    }
+	}
+
 
     // Turn the robot 90 degrees to the right
-    private static void turnRight() {
+    public void turnRight() {
         if (direction.equals("N")) {
             direction = "E";
         } else if (direction.equals("S")) {
@@ -164,7 +175,7 @@ public class RobotDrawing {
     }
 
     // Turn the robot 90 degrees to the left
-    private static void turnLeft() {
+    public void turnLeft() {
         if (direction.equals("N")) {
             direction = "W";
         } else if (direction.equals("S")) {
@@ -177,7 +188,7 @@ public class RobotDrawing {
     }
 
     // Print the floor with the drawing
-    private static void printFloor(JTextArea outputArea) {
+    public void printFloor(JTextArea outputArea) {
     	 StringBuilder sb = new StringBuilder();
     	    // Start from the last row to flip the vertical axis
     	    for (int i = N - 1; i >= 0; i--) {
@@ -200,7 +211,7 @@ public class RobotDrawing {
     	    outputArea.append(sb.toString());
     }
     
-    private static void initializeSystem(int size) {
+    public void initializeSystem(int size) {
         // Initialize size of the floor
         N = size;
 
@@ -217,5 +228,34 @@ public class RobotDrawing {
         // Initialize robot's direction facing North
         direction = "N";
     }
+
+	public int getN() {
+		return N;
+	}
+
+	public int[][] getFloor() {
+		return floor;
+	}
+
+	public int[] getPosition() {
+		return position;
+	}
+
+	public boolean isPenDown() {
+		return penDown;
+	}
+
+	public String getDirection() {
+		return direction;
+	}
+
+	public boolean isFirstMove() {
+		return firstMove;
+	}
+
+	public JTextArea getOutputArea() {
+		return outputArea;
+	}  
+    
 }
 
