@@ -31,12 +31,10 @@ public class RobotDrawing {
         JTextField inputField = new JTextField(50);
         inputField.addActionListener(e -> {
             String command = inputField.getText();
+            outputArea.append("CMD: "+command + "\n");
             processCommand(command);
             inputField.setText("");
-            
-            outputArea.append("CMD: "+command + "\n");
 //            printFloor(outputArea);
-
         });
         mainPanel.add(inputField);
 
