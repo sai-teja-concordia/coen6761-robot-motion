@@ -1,4 +1,7 @@
 package bbear.coen6761.proj;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.*;
 
 public class RobotDrawing {
@@ -18,8 +21,17 @@ public class RobotDrawing {
 
     public void createAndShowGUI() {
         JFrame frame = new JFrame("Robot Drawing");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
+        // Add window listener to handle the window closing event
+        frame.addWindowListener(new WindowAdapter() {
+        	@Override
+            public void windowClosing(WindowEvent e) {
+                // Call a method to perform cleanup or any necessary actions
+                closeFrame();
+            }
+        });
+        
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         
@@ -42,8 +54,28 @@ public class RobotDrawing {
         frame.pack();
         frame.setVisible(true);
     }
+    
+    public void closeFrame() {
+        // Perform any necessary cleanup or actions before closing the frame
+        // For example, save data, close connections, etc.
+    	System.out.println(outputArea.getText().length());
+    	System.out.println(outputArea);
+    	//System.out.println(outputArea.getRootPane().getParent());
+        // Close the frame
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(outputArea);
+        frame.getRootPane().getParent().remove(frame);
+        frame.dispose();
+        // Set the parent of the JFrame to null
+        frame.getGraphicsConfiguration().getDevice().setFullScreenWindow(null);
+        
+        System.out.println(outputArea);
+    }
 
     public void processCommand(String command) {
+    	if (command == null) {
+    		outputArea.append("Error: please enter a command whose value is not null.\n");
+            return;
+        }
     	
     	if (!initialized && !command.toLowerCase().startsWith("i")) {
             outputArea.append("Error: System not initialized. Please initialize the system using the 'i' command before executing any other commands.\n");
@@ -66,9 +98,17 @@ public class RobotDrawing {
 			if (parts.length == 2) {
 				 try {
 		                int steps = Integer.parseInt(parts[1]);
+		                if (steps >= 0)
+		                {
 		                move(steps);
-		            } catch (NumberFormatException e) {
-		                System.err.println("Exception: " + e.getMessage());
+		                }
+		                else
+		                {
+		                	outputArea.append("The number of steps must be a positive number\n");
+		                }
+		            } catch (NumberFormatException nfe) {
+		                //System.err.println("Exception: " + nfe.getMessage());
+		            	outputArea.append("The input format is not a number\n");
 		            } catch (IllegalArgumentException e) {
 		                outputArea.append(e.getMessage() + "\n");
 		          }
@@ -84,7 +124,8 @@ public class RobotDrawing {
 		}
 		else if (command.toLowerCase().equals("q")) {
 			// stop the program
-			System.exit(0);
+			//System.exit(0);
+			closeFrame();
 		}
 		else if (command.toLowerCase().startsWith("i")) {
 		    String[] parts = command.split(" ");
@@ -92,15 +133,28 @@ public class RobotDrawing {
 		        try {
 		            // n is the size of the array
 		            int size = Integer.parseInt(parts[1]);
+		            if (size >= 0)
+	                {
 		            initializeSystem(size);
-		        } catch (NumberFormatException e) {
-		            System.err.println("Exception: " + e.getMessage());
+	                }
+	                else
+	                {
+	                	outputArea.append("The size of the array must be a positive number\n");
+	                }
+		        } catch (NumberFormatException nfe) {
+		            //System.err.println("Exception: " + e.getMessage());
+		        	outputArea.append("The input format is not a number\n");
 		        } catch (IllegalArgumentException e) {
 	                outputArea.append(e.getMessage() + "\n");
 	            }
 		    } else {
 		        System.err.println("Invalid command: " + command);
 		    }
+		}
+		else if (command.trim().isEmpty())
+		{
+			//in case is empty
+			outputArea.append("Error: please enter a command whose value is not empty.\n");
 		}
     }
 
@@ -129,7 +183,14 @@ public class RobotDrawing {
 	}
 
     // Move the robot forward a given number of steps
-	public void move(int steps) throws IllegalArgumentException {
+	public void move(Integer steps) throws IllegalArgumentException {
+		if (steps == null) {
+	        throw new IllegalArgumentException("Error: please enter a number of steps whose value is not null.");
+	    }
+		else if (steps == 0) {
+			throw new IllegalArgumentException("Error: please enter a number of steps whose value is not empty or zero.");
+		}
+		
 	    for (int i = 0; i < steps; i++) {
 	        // Store next position
 	        int[] nextPosition = new int[]{position[0], position[1]};
@@ -214,7 +275,14 @@ public class RobotDrawing {
     	    outputArea.append(sb.toString());
     }
     
-    public void initializeSystem(int size) {
+    public void initializeSystem(Integer size) {
+    	if (size == null) {
+	        throw new IllegalArgumentException("Error: please enter a size whose value is not null.");
+	    }
+    	else if (size == 0){
+    		throw new IllegalArgumentException("Error: please enter a size whose value is not empty or zero.");
+    	}
+    	
         // Initialize size of the floor
         N = size;
 
@@ -271,4 +339,3 @@ public class RobotDrawing {
         return initialized;
     }
 }
-
