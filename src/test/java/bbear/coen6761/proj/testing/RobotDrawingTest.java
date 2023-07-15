@@ -3,7 +3,6 @@ package bbear.coen6761.proj.testing;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import bbear.coen6761.proj.RobotDrawing;
 public class RobotDrawingTest {
@@ -110,11 +109,6 @@ public class RobotDrawingTest {
     	assertEquals(expectedOutput, getLastMessageFromOutputArea());
     }
     
-    // q
-    @Test
-    public void testQuitSystem() {
-    	
-    }
     
 	// i 10
     @Test
@@ -276,12 +270,36 @@ public class RobotDrawingTest {
     // q
     @Test
     public void testQuitSystem() {
-    	rb.processCommand("i 5");
+//    	rb.processCommand("i 5");
     	  
     	rb.processCommand("q");
     	assertTrue(rb.getOutputArea().getRootPane().getParent() == null);
 		
 		rb.processCommand("Q");
 		assertTrue(rb.getOutputArea().getRootPane().getParent() == null);
+		rb.processCommand("i 5");
     }
+    
+    // Test with "u", "d", "r", "l", "p", "c", "q" commands that the system does not accept any characters or numbers following the command.
+    @Test
+    public void testInvalidSingleCharacterCommands() {
+    	rb.processCommand("i 5");
+    	rb.processCommand("u1");
+    	assertEquals("Error: Command does not accept additional characters or numbers.\n", getLastMessageFromOutputArea());
+    }
+    
+    // Test with commands where the first character (lowercase) is not in [“u”,”d”,”r”,”l”,”m”,”p”,”c”,”q”,”i”].
+    @Test
+    public void testFirstCharOfCMDNotRecognized() {
+    	rb.processCommand("i 5");
+    	rb.processCommand("w");
+    	assertEquals("Error: Command not recognized.\n", getLastMessageFromOutputArea());
+    }
+    
+    // Test with "m" and "i" commands that system only accepts inputs where the second character is a space.
+    @Test
+    public void testMoveCommandRequiresSpaceAfterMorI() {
+    	rb.processCommand("i 5");
+    }
+    
 }

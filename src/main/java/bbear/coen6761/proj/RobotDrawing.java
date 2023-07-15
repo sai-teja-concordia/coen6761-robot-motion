@@ -76,10 +76,20 @@ public class RobotDrawing {
     		outputArea.append("Error: please enter a command whose value is not null.\n");
             return;
         }
-    	
+        // Check if the command is 'q' first, regardless of system initialization status
+        if (command.toLowerCase().equals("q")) {
+            // stop the program
+            closeFrame();
+            return;
+        }
     	if (!initialized && !command.toLowerCase().startsWith("i")) {
             outputArea.append("Error: System not initialized. Please initialize "
             		+ "the system using the 'i' command before executing any other commands.\n");
+            return;
+        }
+    	// An error message indicating the command does not accept additional characters or numbers.
+        if (command.toLowerCase().matches("^[udrlpcq].+")) {
+            outputArea.append("Error: Command does not accept additional characters or numbers.\n");
             return;
         }
 	    if (command.toLowerCase().equals("u")) {
@@ -96,7 +106,7 @@ public class RobotDrawing {
 		}
 		else if (command.toLowerCase().startsWith("m")) {
 			String[] parts = command.split(" ");
-			if (parts.length == 2) {
+			if (parts[0].toLowerCase().equals("m") && parts.length == 2) {
 				 try {
 		                int steps = Integer.parseInt(parts[1]);
 		                if (steps >= 0)
@@ -114,7 +124,8 @@ public class RobotDrawing {
 		                outputArea.append(e.getMessage() + "\n");
 		          }
 			} else {
-	                System.err.println("Invalid move command: " + command);
+				 outputArea.append("Invalid move command: The input format is incorrect. "
+                         + "The command and number should be separated by a space.\n");
 	        }
 		}
 		else if (command.toLowerCase().equals("p")) {
@@ -123,14 +134,9 @@ public class RobotDrawing {
 		else if (command.toLowerCase().equals("c")) {
 	        printCurrentPosition();
 		}
-		else if (command.toLowerCase().equals("q")) {
-			// stop the program
-			//System.exit(0);
-			closeFrame();
-		}
 		else if (command.toLowerCase().startsWith("i")) {
 		    String[] parts = command.split(" ");
-		    if (parts.length == 2) {
+		    if (parts[0].toLowerCase().equals("i") && parts.length == 2) {
 		        try {
 		            // n is the size of the array
 		            int size = Integer.parseInt(parts[1]);
@@ -149,7 +155,8 @@ public class RobotDrawing {
 	                outputArea.append(e.getMessage() + "\n");
 	            }
 		    } else {
-		        System.err.println("Invalid command: " + command);
+		    	 outputArea.append("Invalid initialize command: The input format is incorrect. "
+                         + "The command and number should be separated by a space.\n");
 		    }
 		}
 		else if (command.trim().isEmpty())
@@ -157,6 +164,11 @@ public class RobotDrawing {
 			//in case is empty
 			outputArea.append("Error: please enter a command whose value is not empty.\n");
 		}
+	    // Handle commands that start with an unexpected character
+	    else if (!command.toLowerCase().matches("^[udrlmpcqi].*")) {
+	        outputArea.append("Error: Command not recognized.\n");
+	        return;
+	    }
     }
 
 	public void printCurrentPosition() {
