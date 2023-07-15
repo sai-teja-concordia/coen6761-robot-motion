@@ -13,26 +13,31 @@ public class RobotDrawingTest {
 	// d
 	@Test
 	public void testPenDown() {
+		// initialize system
 		rb.processCommand("i 5");
 		
+		// d
 		rb.processCommand("d");
 		assertTrue(rb.isPenDown());
 		
+		// D
 		rb.processCommand("D");
 		assertTrue(rb.isPenDown());
-		
-		// when 
 	}
 	
 	// u
 	@Test
 	public void testPenUp() {
+		// initialize system
 		rb.processCommand("i 5");
+		
 		rb.processCommand("d");
+		// u
 		rb.processCommand("u");
 		assertFalse(rb.isPenDown());
 		
 		rb.processCommand("d");
+		// U
 		rb.processCommand("U");
 		assertFalse(rb.isPenDown());
 	}
@@ -40,10 +45,14 @@ public class RobotDrawingTest {
 	// r
 	@Test
 	public void testTurnRight() {
+		// initialize system
 		rb.processCommand("i 5");
+		
+		// r 
         rb.processCommand("r");
         assertEquals("E", rb.getDirection());
         
+        // R
         rb.processCommand("R");;
         assertEquals("S", rb.getDirection());
 	}

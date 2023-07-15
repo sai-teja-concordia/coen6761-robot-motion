@@ -46,7 +46,8 @@ public class RobotDrawing {
     public void processCommand(String command) {
     	
     	if (!initialized && !command.toLowerCase().startsWith("i")) {
-            outputArea.append("Error: System not initialized. Please initialize the system using the 'i' command before executing any other commands.\n");
+            outputArea.append("Error: System not initialized. Please initialize "
+            		+ "the system using the 'i' command before executing any other commands.\n");
             return;
         }
 	    if (command.toLowerCase().equals("u")) {
@@ -124,7 +125,8 @@ public class RobotDrawing {
 		    default:
 		        directionFull = "Invalid Direction";
 		}
-		String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[0], position[1], penStatus,directionFull);
+		String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[0], position[1], 
+				penStatus,directionFull);
 		outputArea.append(formattedPosition + "\n");
 	}
 
