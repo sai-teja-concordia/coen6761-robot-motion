@@ -92,6 +92,19 @@ public class RobotDrawingTest {
             "0 *         \n" +
             "  0 1 2 3 4 \n";
         assertEquals(expectedOutput, rb.getOutputArea().getText());
+        
+        rb.getOutputArea().setText("");
+    	rb.processCommand("u");
+    	rb.processCommand("m 2");	
+        rb.printFloor(rb.getOutputArea());
+        String expectedOutput2 = 
+            "4           \n" +
+            "3           \n" +
+            "2 *         \n" +
+            "1 *         \n" +
+            "0 *         \n" +
+            "  0 1 2 3 4 \n";
+        assertEquals(expectedOutput2, rb.getOutputArea().getText());
     }
     
     // c
