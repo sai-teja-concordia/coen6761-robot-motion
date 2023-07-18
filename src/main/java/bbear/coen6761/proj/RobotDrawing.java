@@ -13,6 +13,7 @@ public class RobotDrawing {
     private boolean firstMove; // Added variable
     private JTextArea outputArea = new JTextArea(20, 50);
     private boolean initialized = false;
+    private boolean isShutdown = false;
 
     public static void main(String[] args) {
     	RobotDrawing rd = new RobotDrawing();
@@ -21,16 +22,6 @@ public class RobotDrawing {
 
     public void createAndShowGUI() {
         JFrame frame = new JFrame("Robot Drawing");
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        
-        // Add window listener to handle the window closing event
-        frame.addWindowListener(new WindowAdapter() {
-        	@Override
-            public void windowClosing(WindowEvent e) {
-                // Call a method to perform cleanup or any necessary actions
-                closeFrame();
-            }
-        });
         
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -54,22 +45,6 @@ public class RobotDrawing {
         frame.pack();
         frame.setVisible(true);
     }
-    
-    public void closeFrame() {
-        // Perform any necessary cleanup or actions before closing the frame
-        // For example, save data, close connections, etc.
-    	System.out.println(outputArea.getText().length());
-    	System.out.println(outputArea);
-    	//System.out.println(outputArea.getRootPane().getParent());
-        // Close the frame
-        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(outputArea);
-        frame.getRootPane().getParent().remove(frame);
-        frame.dispose();
-        // Set the parent of the JFrame to null
-        frame.getGraphicsConfiguration().getDevice().setFullScreenWindow(null);
-        
-        System.out.println(outputArea);
-    }
 
     public void processCommand(String command) {
     	if (command == null) {
@@ -79,7 +54,7 @@ public class RobotDrawing {
         // Check if the command is 'q' first, regardless of system initialization status
         if (command.toLowerCase().equals("q")) {
             // stop the program
-            closeFrame();
+            shutdown();
             return;
         }
     	if (!initialized && !command.toLowerCase().startsWith("i")) {
@@ -352,4 +327,16 @@ public class RobotDrawing {
 	public boolean isInitialized() {
         return initialized;
     }
+	
+	public boolean isInShutdownState() {
+	    return isShutdown;
+	}
+	
+	// Call this when 'q' or 'Q' command is processed
+	public void shutdown() {
+	    // Perform any necessary cleanup here
+	    // Then set the shutdown state
+	    this.isShutdown = true;
+	    System.exit(0);
+	}
 }

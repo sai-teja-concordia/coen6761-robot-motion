@@ -2,6 +2,7 @@ package bbear.coen6761.proj.testing;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.security.Permission;
 
 import org.junit.jupiter.api.Test;
 import bbear.coen6761.proj.RobotDrawing;
@@ -80,6 +81,7 @@ public class RobotDrawingTest {
 	// p
     @Test
     public void testPrintFloor() {
+        
     	rb.processCommand("i 5");
     	rb.processCommand("d");
     	rb.processCommand("m 2");	
@@ -107,6 +109,14 @@ public class RobotDrawingTest {
         assertEquals(expectedOutput2, rb.getOutputArea().getText());
     }
     
+    
+    // Test with command “p” without first initializing the system.
+    @Test 
+    public void testOtherCMDWithouInitSys() {
+         rb.processCommand("p");
+         assertEquals("Error: System not initialized. Please initialize "
+         		+ "the system using the 'i' command before executing any other commands.\n", getLastMessageFromOutputArea());
+    }
     // c
     @Test
     public void testPrintCurrentPosition() {
@@ -281,16 +291,48 @@ public class RobotDrawingTest {
     }
     
     // q
-    @Test
-    public void testQuitSystem() {
-//    	rb.processCommand("i 5");
-    	  
-    	rb.processCommand("q");
-    	assertTrue(rb.getOutputArea().getRootPane().getParent() == null);
+    @SuppressWarnings("removal")
+	@Test
+    public void testQuitSystem() {    	  
 		
-		rb.processCommand("Q");
-		assertTrue(rb.getOutputArea().getRootPane().getParent() == null);
-		rb.processCommand("i 5");
+	    // Set a security manager that prevents exit
+	    System.setSecurityManager(new NoExitSecurityManager());
+
+	    // Run processCommand and expect a SecurityException
+	    assertThrows(SecurityException.class, () -> {
+	        rb.processCommand("q");
+	    });
+	    assertTrue(rb.isInShutdownState());
+
+	    
+	    // Reset the security manager
+	    System.setSecurityManager(null);
+	    
+	    
+	    // Set a security manager that prevents exit
+	    System.setSecurityManager(new NoExitSecurityManager());
+	    assertThrows(SecurityException.class, () -> {
+	        rb.processCommand("Q");
+	    });
+	    assertTrue(rb.isInShutdownState());
+	    // Reset the security manager
+	    System.setSecurityManager(null);
+    }
+    
+    private static class NoExitSecurityManager extends SecurityManager {
+        @Override
+        public void checkPermission(Permission perm) {
+            // allow anything.
+        }
+        @Override
+        public void checkPermission(Permission perm, Object context) {
+            // allow anything.
+        }
+        @Override
+        public void checkExit(int status) {
+            super.checkExit(status);
+            throw new SecurityException("System exit not allowed in tests");
+        }
     }
     
     // Test with "u", "d", "r", "l", "p", "c", "q" commands that the system does not accept any characters or numbers following the command.
