@@ -1,10 +1,10 @@
 package bbear.coen6761.proj.testing;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.security.Permission;
 
-import org.junit.jupiter.api.Test;
 import bbear.coen6761.proj.RobotDrawing;
 public class RobotDrawingTest {
 

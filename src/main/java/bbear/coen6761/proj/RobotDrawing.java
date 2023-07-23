@@ -79,6 +79,7 @@ public class RobotDrawing {
 		else if (command.toLowerCase().equals("l")) {
 			turnLeft();
 		}
+//	    "m  3" => [m,"",3]
 		else if (command.toLowerCase().startsWith("m")) {
 			String[] parts = command.split(" ");
 			if (parts[0].toLowerCase().equals("m") && parts.length == 2) {
@@ -86,7 +87,7 @@ public class RobotDrawing {
 		                int steps = Integer.parseInt(parts[1]);
 		                if (steps >= 0)
 		                {
-		                move(steps);
+		                	move(steps);
 		                }
 		                else
 		                {
@@ -117,7 +118,7 @@ public class RobotDrawing {
 		            int size = Integer.parseInt(parts[1]);
 		            if (size >= 0)
 	                {
-		            initializeSystem(size);
+		            	initializeSystem(size);
 	                }
 	                else
 	                {

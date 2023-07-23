@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RobotDrawing.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proj</a> &gt; <a href="index.source.html" class="el_package">bbear.coen6761.proj</a> &gt; <span class="el_source">RobotDrawing.java</span></div><h1>RobotDrawing.java</h1><pre class="source lang-java linenums">package bbear.coen6761.proj;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.*;
+
+<span class="fc" id="L7">public class RobotDrawing {</span>
+    private int N; // Size of the floor
+    private int[][] floor; // The floor array
+    private int[] position; // Robot's initial position [row, col]
+    private boolean penDown; // Robot's pen status
+    private String direction; // Robot's initial direction
+    private boolean firstMove; // Added variable
+<span class="fc" id="L14">    private JTextArea outputArea = new JTextArea(20, 50);</span>
+<span class="fc" id="L15">    private boolean initialized = false;</span>
+<span class="fc" id="L16">    private boolean isShutdown = false;</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L19">    	RobotDrawing rd = new RobotDrawing();</span>
+<span class="nc" id="L20">        SwingUtilities.invokeLater(() -&gt; rd.createAndShowGUI());</span>
+<span class="nc" id="L21">    }</span>
+
+    public void createAndShowGUI() {
+<span class="nc" id="L24">        JFrame frame = new JFrame(&quot;Robot Drawing&quot;);</span>
+        
+<span class="nc" id="L26">        JPanel mainPanel = new JPanel();</span>
+<span class="nc" id="L27">        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));</span>
+        
+//        outputArea = new JTextArea(20, 50);
+<span class="nc" id="L30">        outputArea.setEditable(false);</span>
+<span class="nc" id="L31">        JScrollPane scrollPane = new JScrollPane(outputArea);</span>
+<span class="nc" id="L32">        mainPanel.add(scrollPane);</span>
+
+<span class="nc" id="L34">        JTextField inputField = new JTextField(50);</span>
+<span class="nc" id="L35">        inputField.addActionListener(e -&gt; {</span>
+<span class="nc" id="L36">            String command = inputField.getText();</span>
+<span class="nc" id="L37">            outputArea.append(&quot;CMD: &quot;+command + &quot;\n&quot;);</span>
+<span class="nc" id="L38">            processCommand(command);</span>
+<span class="nc" id="L39">            inputField.setText(&quot;&quot;);</span>
+//            printFloor(outputArea);
+<span class="nc" id="L41">        });</span>
+<span class="nc" id="L42">        mainPanel.add(inputField);</span>
+
+<span class="nc" id="L44">        frame.getContentPane().add(mainPanel);</span>
+<span class="nc" id="L45">        frame.pack();</span>
+<span class="nc" id="L46">        frame.setVisible(true);</span>
+<span class="nc" id="L47">    }</span>
+
+    public void processCommand(String command) {
+<span class="fc bfc" id="L50" title="All 2 branches covered.">    	if (command == null) {</span>
+<span class="fc" id="L51">    		outputArea.append(&quot;Error: please enter a command whose value is not null.\n&quot;);</span>
+<span class="fc" id="L52">            return;</span>
+        }
+        // Check if the command is 'q' first, regardless of system initialization status
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (command.toLowerCase().equals(&quot;q&quot;)) {</span>
+            // stop the program
+<span class="nc" id="L57">            shutdown();</span>
+<span class="nc" id="L58">            return;</span>
+        }
+<span class="fc bfc" id="L60" title="All 4 branches covered.">    	if (!initialized &amp;&amp; !command.toLowerCase().startsWith(&quot;i&quot;)) {</span>
+<span class="fc" id="L61">            outputArea.append(&quot;Error: System not initialized. Please initialize &quot;</span>
+            		+ &quot;the system using the 'i' command before executing any other commands.\n&quot;);
+<span class="fc" id="L63">            return;</span>
+        }
+    	// An error message indicating the command does not accept additional characters or numbers.
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (command.toLowerCase().matches(&quot;^[udrlpcq].+&quot;)) {</span>
+<span class="fc" id="L67">            outputArea.append(&quot;Error: Command does not accept additional characters or numbers.\n&quot;);</span>
+<span class="fc" id="L68">            return;</span>
+        }
+<span class="fc bfc" id="L70" title="All 2 branches covered.">	    if (command.toLowerCase().equals(&quot;u&quot;)) {</span>
+<span class="fc" id="L71">	    	setPenDown(false);</span>
+	    }
+<span class="fc bfc" id="L73" title="All 2 branches covered.">	    else if (command.toLowerCase().equals(&quot;d&quot;)) {</span>
+<span class="fc" id="L74">	    	setPenDown(true);</span>
+	    }
+<span class="fc bfc" id="L76" title="All 2 branches covered.">		else if (command.toLowerCase().equals(&quot;r&quot;)) {</span>
+<span class="fc" id="L77">			turnRight();</span>
+		}
+<span class="fc bfc" id="L79" title="All 2 branches covered.">		else if (command.toLowerCase().equals(&quot;l&quot;)) {</span>
+<span class="fc" id="L80">			turnLeft();</span>
+		}
+//	    &quot;m  3&quot; =&gt; [m,&quot;&quot;,3]
+<span class="fc bfc" id="L83" title="All 2 branches covered.">		else if (command.toLowerCase().startsWith(&quot;m&quot;)) {</span>
+<span class="fc" id="L84">			String[] parts = command.split(&quot; &quot;);</span>
+<span class="pc bpc" id="L85" title="2 of 4 branches missed.">			if (parts[0].toLowerCase().equals(&quot;m&quot;) &amp;&amp; parts.length == 2) {</span>
+				 try {
+<span class="fc" id="L87">		                int steps = Integer.parseInt(parts[1]);</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">		                if (steps &gt;= 0)</span>
+		                {
+<span class="fc" id="L90">		                	move(steps);</span>
+		                }
+		                else
+		                {
+<span class="fc" id="L94">		                	outputArea.append(&quot;The number of steps must be a positive number\n&quot;);</span>
+		                }
+<span class="fc" id="L96">		            } catch (NumberFormatException nfe) {</span>
+		                //System.err.println(&quot;Exception: &quot; + nfe.getMessage());
+<span class="fc" id="L98">		            	outputArea.append(&quot;The input format is not a number\n&quot;);</span>
+<span class="fc" id="L99">		            } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L100">		                outputArea.append(e.getMessage() + &quot;\n&quot;);</span>
+<span class="fc" id="L101">		          }</span>
+			} else {
+<span class="nc" id="L103">				 outputArea.append(&quot;Invalid move command: The input format is incorrect. &quot;</span>
+                         + &quot;The command and number should be separated by a space.\n&quot;);
+	        }
+<span class="fc" id="L106">		}</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">		else if (command.toLowerCase().equals(&quot;p&quot;)) {</span>
+<span class="nc" id="L108">            printFloor(outputArea);</span>
+		}
+<span class="fc bfc" id="L110" title="All 2 branches covered.">		else if (command.toLowerCase().equals(&quot;c&quot;)) {</span>
+<span class="fc" id="L111">	        printCurrentPosition();</span>
+		}
+<span class="fc bfc" id="L113" title="All 2 branches covered.">		else if (command.toLowerCase().startsWith(&quot;i&quot;)) {</span>
+<span class="fc" id="L114">		    String[] parts = command.split(&quot; &quot;);</span>
+<span class="pc bpc" id="L115" title="2 of 4 branches missed.">		    if (parts[0].toLowerCase().equals(&quot;i&quot;) &amp;&amp; parts.length == 2) {</span>
+		        try {
+		            // n is the size of the array
+<span class="fc" id="L118">		            int size = Integer.parseInt(parts[1]);</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">		            if (size &gt;= 0)</span>
+	                {
+<span class="fc" id="L121">		            	initializeSystem(size);</span>
+	                }
+	                else
+	                {
+<span class="fc" id="L125">	                	outputArea.append(&quot;The size of the array must be a positive number\n&quot;);</span>
+	                }
+<span class="fc" id="L127">		        } catch (NumberFormatException nfe) {</span>
+		            //System.err.println(&quot;Exception: &quot; + e.getMessage());
+<span class="fc" id="L129">		        	outputArea.append(&quot;The input format is not a number\n&quot;);</span>
+<span class="nc" id="L130">		        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L131">	                outputArea.append(e.getMessage() + &quot;\n&quot;);</span>
+<span class="pc" id="L132">	            }</span>
+		    } else {
+<span class="nc" id="L134">		    	 outputArea.append(&quot;Invalid initialize command: The input format is incorrect. &quot;</span>
+                         + &quot;The command and number should be separated by a space.\n&quot;);
+		    }
+<span class="fc" id="L137">		}</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">		else if (command.trim().isEmpty())</span>
+		{
+			//in case is empty
+<span class="fc" id="L141">			outputArea.append(&quot;Error: please enter a command whose value is not empty.\n&quot;);</span>
+		}
+	    // Handle commands that start with an unexpected character
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">	    else if (!command.toLowerCase().matches(&quot;^[udrlmpcqi].*&quot;)) {</span>
+<span class="fc" id="L145">	        outputArea.append(&quot;Error: Command not recognized.\n&quot;);</span>
+<span class="fc" id="L146">	        return;</span>
+	    }
+<span class="fc" id="L148">    }</span>
+
+	public void printCurrentPosition() {
+		// Print current position, pen status and direction
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">		String penStatus = penDown ? &quot;down&quot; : &quot;up&quot;;</span>
+		String directionFull;
+<span class="pc bpc" id="L154" title="4 of 5 branches missed.">		switch (direction) {</span>
+		    case &quot;N&quot;:
+<span class="nc" id="L156">		        directionFull = &quot;North&quot;;</span>
+<span class="nc" id="L157">		        break;</span>
+		    case &quot;S&quot;:
+<span class="nc" id="L159">		        directionFull = &quot;South&quot;;</span>
+<span class="nc" id="L160">		        break;</span>
+		    case &quot;E&quot;:
+<span class="fc" id="L162">		        directionFull = &quot;East&quot;;</span>
+<span class="fc" id="L163">		        break;</span>
+		    case &quot;W&quot;:
+<span class="nc" id="L165">		        directionFull = &quot;West&quot;;</span>
+<span class="nc" id="L166">		        break;</span>
+		    default:
+<span class="nc" id="L168">		        directionFull = &quot;Invalid Direction&quot;;</span>
+		}
+<span class="fc" id="L170">		String formattedPosition = String.format(&quot;Position: %d, %d - Pen: %s - Facing: %s&quot;, position[0], position[1], </span>
+				penStatus,directionFull);
+<span class="fc" id="L172">		outputArea.append(formattedPosition + &quot;\n&quot;);</span>
+<span class="fc" id="L173">	}</span>
+
+    // Move the robot forward a given number of steps
+	public void move(Integer steps) throws IllegalArgumentException {
+<span class="fc bfc" id="L177" title="All 2 branches covered.">		if (steps == null) {</span>
+<span class="fc" id="L178">	        throw new IllegalArgumentException(&quot;Error: please enter a number of steps whose value is not null.&quot;);</span>
+	    }
+<span class="fc bfc" id="L180" title="All 2 branches covered.">		else if (steps == 0) {</span>
+<span class="fc" id="L181">			throw new IllegalArgumentException(&quot;Error: please enter a number of steps whose value is not empty or zero.&quot;);</span>
+		}
+		
+<span class="fc bfc" id="L184" title="All 2 branches covered.">	    for (int i = 0; i &lt; steps; i++) {</span>
+	        // Store next position
+<span class="fc" id="L186">	        int[] nextPosition = new int[]{position[0], position[1]};</span>
+	        
+<span class="fc bfc" id="L188" title="All 4 branches covered.">	        if (firstMove &amp;&amp; penDown) {</span>
+<span class="fc" id="L189">	             floor[position[0]][position[1]] = 1; </span>
+<span class="fc" id="L190">	             firstMove = false; // Reset the flag</span>
+	        }
+	        
+<span class="fc bfc" id="L193" title="All 2 branches covered.">	        if (direction.equals(&quot;N&quot;)) {</span>
+<span class="fc" id="L194">	            nextPosition[0]++;</span>
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">	        } else if (direction.equals(&quot;S&quot;)) {</span>
+<span class="nc" id="L196">	            nextPosition[0]--;</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">	        } else if (direction.equals(&quot;W&quot;)) {</span>
+<span class="nc" id="L198">	            nextPosition[1]--;</span>
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">	        } else if (direction.equals(&quot;E&quot;)) {</span>
+<span class="fc" id="L200">	            nextPosition[1]++;</span>
+	        }
+
+	        // Check if next position is valid
+<span class="pc bpc" id="L204" title="3 of 8 branches missed.">	        if (nextPosition[0] &lt; 0 || nextPosition[0] &gt;= N || nextPosition[1] &lt; 0 || nextPosition[1] &gt;= N) {</span>
+<span class="fc" id="L205">	            throw new IllegalArgumentException(&quot;Robot can't move out of the board!&quot;);</span>
+	        }
+
+	        // Update position
+<span class="fc" id="L209">	        position = nextPosition;</span>
+
+<span class="fc bfc" id="L211" title="All 2 branches covered.">	        if (penDown) {</span>
+<span class="fc" id="L212">	            floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk</span>
+	        }
+	    }
+<span class="fc" id="L215">	}</span>
+
+
+    // Turn the robot 90 degrees to the right
+    public void turnRight() {
+<span class="fc bfc" id="L220" title="All 2 branches covered.">        if (direction.equals(&quot;N&quot;)) {</span>
+<span class="fc" id="L221">            direction = &quot;E&quot;;</span>
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">        } else if (direction.equals(&quot;S&quot;)) {</span>
+<span class="nc" id="L223">            direction = &quot;W&quot;;</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">        } else if (direction.equals(&quot;W&quot;)) {</span>
+<span class="nc" id="L225">            direction = &quot;N&quot;;</span>
+<span class="pc bpc" id="L226" title="1 of 2 branches missed.">        } else if (direction.equals(&quot;E&quot;)) {</span>
+<span class="fc" id="L227">            direction = &quot;S&quot;;</span>
+        }
+<span class="fc" id="L229">    }</span>
+
+    // Turn the robot 90 degrees to the left
+    public void turnLeft() {
+<span class="fc bfc" id="L233" title="All 2 branches covered.">        if (direction.equals(&quot;N&quot;)) {</span>
+<span class="fc" id="L234">            direction = &quot;W&quot;;</span>
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        } else if (direction.equals(&quot;S&quot;)) {</span>
+<span class="nc" id="L236">            direction = &quot;E&quot;;</span>
+<span class="pc bpc" id="L237" title="1 of 2 branches missed.">        } else if (direction.equals(&quot;W&quot;)) {</span>
+<span class="fc" id="L238">            direction = &quot;S&quot;;</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        } else if (direction.equals(&quot;E&quot;)) {</span>
+<span class="nc" id="L240">            direction = &quot;N&quot;;</span>
+        }
+<span class="fc" id="L242">    }</span>
+
+    // Print the floor with the drawing
+    public void printFloor(JTextArea outputArea) {
+<span class="fc" id="L246">    	 StringBuilder sb = new StringBuilder();</span>
+    	    // Start from the last row to flip the vertical axis
+<span class="fc bfc" id="L248" title="All 2 branches covered.">    	    for (int i = N - 1; i &gt;= 0; i--) {</span>
+<span class="fc" id="L249">    	        sb.append(i).append(&quot; &quot;); // Print row index</span>
+<span class="fc bfc" id="L250" title="All 2 branches covered.">    	        for (int j = 0; j &lt; N; j++) {</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">    	            if (floor[i][j] == 1) {</span>
+<span class="fc" id="L252">    	                sb.append(&quot;* &quot;);</span>
+    	            } else {
+<span class="fc" id="L254">    	                sb.append(&quot;  &quot;);</span>
+    	            }
+    	        }
+<span class="fc" id="L257">    	        sb.append(&quot;\n&quot;);</span>
+    	    }
+    	    // Print column indexes
+<span class="fc" id="L260">    	    sb.append(&quot;  &quot;); // Offset for row indexes</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">    	    for (int i = 0; i &lt; N; i++) {</span>
+<span class="fc" id="L262">    	        sb.append(i).append(&quot; &quot;);</span>
+    	    }
+<span class="fc" id="L264">    	    sb.append(&quot;\n&quot;);</span>
+<span class="fc" id="L265">    	    outputArea.append(sb.toString());</span>
+<span class="fc" id="L266">    }</span>
+    
+    public void initializeSystem(Integer size) {
+<span class="fc bfc" id="L269" title="All 2 branches covered.">    	if (size == null) {</span>
+<span class="fc" id="L270">	        throw new IllegalArgumentException(&quot;Error: please enter a size whose value is not null.&quot;);</span>
+	    }
+<span class="fc bfc" id="L272" title="All 2 branches covered.">    	else if (size == 0){</span>
+<span class="fc" id="L273">    		throw new IllegalArgumentException(&quot;Error: please enter a size whose value is not empty or zero.&quot;);</span>
+    	}
+    	
+        // Initialize size of the floor
+<span class="fc" id="L277">        N = size;</span>
+
+        // Initialize the floor array
+<span class="fc" id="L280">        floor = new int[N][N];</span>
+
+        // Initialize robot's position
+<span class="fc" id="L283">        position = new int[] {0, 0};</span>
+<span class="fc" id="L284">        firstMove = true;</span>
+
+        // Lift the pen up
+<span class="fc" id="L287">        penDown = false;</span>
+
+        // Initialize robot's direction facing North
+<span class="fc" id="L290">        direction = &quot;N&quot;;</span>
+        
+        // System is initialized
+<span class="fc" id="L293">        initialized = true;</span>
+<span class="fc" id="L294">    }</span>
+
+	public int getN() {
+<span class="fc" id="L297">		return N;</span>
+	}
+
+	public int[][] getFloor() {
+<span class="fc" id="L301">		return floor;</span>
+	}
+
+	public int[] getPosition() {
+<span class="fc" id="L305">		return position;</span>
+	}
+
+	public boolean isPenDown() {
+<span class="fc" id="L309">		return penDown;</span>
+	}
+
+	public String getDirection() {
+<span class="fc" id="L313">		return direction;</span>
+	}
+
+	public boolean isFirstMove() {
+<span class="nc" id="L317">		return firstMove;</span>
+	}
+	
+	public void setPenDown(boolean penDown) {
+<span class="fc" id="L321">		this.penDown = penDown;</span>
+<span class="fc" id="L322">	}</span>
+
+	public JTextArea getOutputArea() {
+<span class="fc" id="L325">		return outputArea;</span>
+	} 
+	
+	public boolean isInitialized() {
+<span class="nc" id="L329">        return initialized;</span>
+    }
+	
+	public boolean isInShutdownState() {
+<span class="fc" id="L333">	    return isShutdown;</span>
+	}
+	
+	// Call this when 'q' or 'Q' command is processed
+	public void shutdown() {
+	    // Perform any necessary cleanup here
+	    // Then set the shutdown state
+<span class="fc" id="L340">	    this.isShutdown = true;</span>
+<span class="nc" id="L341">	    System.exit(0);</span>
+<span class="nc" id="L342">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
