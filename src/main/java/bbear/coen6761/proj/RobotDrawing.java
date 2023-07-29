@@ -47,6 +47,7 @@ public class RobotDrawing {
     }
 
     public void processCommand(String command) {
+    	//outputArea.append("-----"+command+"----");
     	if (command == null) {
     		outputArea.append("Error: please enter a command whose value is not null.\n");
             return;

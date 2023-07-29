@@ -3,6 +3,8 @@ package dev11.coen6761.project_testing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
+import javax.sound.sampled.ReverbType;
+
 import org.junit.jupiter.api.Test;
 
 import bbear.coen6761.proj.RobotDrawing;
@@ -25,5 +27,20 @@ class RobotTesting {
         		+ "the system using the 'i' command before executing any other commands.\n";
 	assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
-}
 
+ 
+	@Test
+	public void InitializationTest2() {
+		robot.processCommand("i 8");
+		assertTrue(robot.isInitialized());
+	}
+	  
+	@Test
+	public void InitializationTest3() {
+		robot.processCommand("");
+		String expectedOutput = "Error: System not initialized. Please initialize "
+        		+ "the system using the 'i' command before executing any other commands.\n";
+		assertEquals(expectedOutput, robot.getOutputArea().getText());
+	}
+	
+}
