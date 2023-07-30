@@ -11,7 +11,7 @@ public class Dev11RobotDrawingTest {
 	private RobotDrawing robot = new RobotDrawing();
 	
 	@Test
-	public void InitializationTest() {
+	public void initializationTest() {
 		robot.processCommand("i");
 		String expectedOutput = "Invalid initialize command: The input format is incorrect. "
                 + "The command and number should be separated by a space.\n";
@@ -19,7 +19,7 @@ public class Dev11RobotDrawingTest {
 	}
 
 	@Test
-	public void InitializationTest1() {
+	public void initializationTest1() {
 		robot.processCommand("p");
 		String expectedOutput = "Error: System not initialized. Please initialize "
         		+ "the system using the 'i' command before executing any other commands.\n";
@@ -28,13 +28,13 @@ public class Dev11RobotDrawingTest {
 
  
 	@Test
-	public void InitializationTest2() {
+	public void initializationTest2() {
 		robot.processCommand("i 8");
 		assertTrue(robot.isInitialized());
 	}
 	  
 	@Test
-	public void InitializationTest3() {
+	public void initializationTest3() {
 		robot.processCommand("");
 		String expectedOutput = "Error: System not initialized. Please initialize "
         		+ "the system using the 'i' command before executing any other commands.\n";
@@ -50,11 +50,21 @@ public class Dev11RobotDrawingTest {
 	
 	@Test
 	public void PenUpTest() {
-		robot.processCommand("i 10");
+		//robot.processCommand("i 10");
+		initializeSystemAndAssert(10);
 		robot.processCommand("u");
 		assertFalse(robot.isPenDown());
 	}
 
+	@Test
+	public void invalidInputTest() {
+		robot.initializeSystem(10);
+		robot.processCommand("z");
+		String expected = "Error: Command not recognized.\n";
+		assertEquals(expected, robot.getOutputArea().getText());
+	}
+	
+	
 	public void initializeSystemAndAssert(int size){
 
 		robot.initializeSystem(size);
