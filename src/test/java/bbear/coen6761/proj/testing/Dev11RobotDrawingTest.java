@@ -3,8 +3,6 @@ package bbear.coen6761.proj.testing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
-import javax.sound.sampled.ReverbType;
-
 import org.junit.jupiter.api.Test;
 
 import bbear.coen6761.proj.RobotDrawing;
