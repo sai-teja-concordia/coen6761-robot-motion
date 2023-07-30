@@ -43,4 +43,17 @@ class RobotTesting {
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
 	
+	@Test
+	public void PenDownTest() {
+		robot.processCommand("i 10");
+		robot.processCommand("d");
+		assertTrue(robot.isPenDown());
+	}
+	
+	@Test
+	public void PenUpTest() {
+		robot.processCommand("i 10");
+		robot.processCommand("u");
+		assertFalse(robot.isPenDown());
+	}
 }
