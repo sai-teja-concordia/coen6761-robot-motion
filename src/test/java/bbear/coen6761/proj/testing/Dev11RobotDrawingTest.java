@@ -1,4 +1,4 @@
-package dev11.coen6761.project_testing;
+package bbear.coen6761.proj.testing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import bbear.coen6761.proj.RobotDrawing;
 
-class RobotTesting {
+public class Dev11RobotDrawingTest {
 	private RobotDrawing robot = new RobotDrawing();
 	
 	@Test
