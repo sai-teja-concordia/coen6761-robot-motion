@@ -1,8 +1,8 @@
 package bbear.coen6761.proj.testing;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import bbear.coen6761.proj.RobotDrawing;
@@ -40,10 +40,10 @@ public class Dev11RobotDrawingTest {
         		+ "the system using the 'i' command before executing any other commands.\n";
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
-	
+
 	@Test
 	public void PenDownTest() {
-		robot.processCommand("i 10");
+		initializeSystemAndAssert(10);
 		robot.processCommand("d");
 		assertTrue(robot.isPenDown());
 	}
@@ -53,5 +53,18 @@ public class Dev11RobotDrawingTest {
 		robot.processCommand("i 10");
 		robot.processCommand("u");
 		assertFalse(robot.isPenDown());
+	}
+
+	public void initializeSystemAndAssert(int size){
+
+		robot.initializeSystem(size);
+		assertTrue(robot.isInitialized());
+		assertEquals(size, robot.getFloor().length);
+		for (int[] row : robot.getFloor()) {
+			assertEquals(size, row.length);
+		}
+		assertFalse(robot.isPenDown());
+		assertEquals("N",robot.getDirection());
+		assertArrayEquals(new int[]{0,0},robot.getPosition());
 	}
 }
