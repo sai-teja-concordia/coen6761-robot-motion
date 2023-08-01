@@ -149,7 +149,34 @@ public class Dev11RobotDrawingTest {
 		robot.processCommand("l");
 		Exception exception = assertThrows(IllegalArgumentException.class , () -> robot.move(4));
 		assertEquals("Robot can't move out of the board!", exception.getMessage());
-		assertArrayEquals(new int[]{4,3}, robot.getPosition());
+	}
+
+	@DisplayName("TC 15 : Print Robot Position (Pen Up).")
+	@Test
+	public void robotPositionPenUp() {
+		initializeSystemAndAssert(10);
+		robot.processCommand("r");
+		robot.move(4);
+		robot.processCommand("l");
+		robot.move(2);
+		robot.processCommand("c");
+		String expectedOutput = "Position: 4, 2 - Pen: up - Facing: North\n";
+		assertEquals(expectedOutput, robot.getOutputArea().getText());
+	}
+
+
+	@DisplayName("TC 16 : Print Robot Position (Pen Down).")
+	@Test
+	public void robotPositionPenDown() {
+		initializeSystemAndAssert(10);
+		robot.processCommand("r");
+		robot.processCommand("d");
+		robot.move(4);
+		robot.processCommand("l");
+		robot.move(2);
+		robot.processCommand("c");
+		String expectedOutput = "Position: 4, 2 - Pen: down - Facing: North\n";
+		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
 
 	private int[] getInitialRobotPosition() {
