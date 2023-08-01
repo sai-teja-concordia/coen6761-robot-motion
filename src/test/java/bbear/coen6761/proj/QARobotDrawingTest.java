@@ -68,12 +68,14 @@ public class QARobotDrawingTest {
 
 	}
 
-	@DisplayName("TC 8 From the Direction North, the User inputs <r> or <R> expected direction is East")
+	@DisplayName("TC 8 From the Direction North, the User inputs <r> or <R> 3 times. expected direction is West.")
 	@Test
 	public void rotateRightTest() {
 		initializeSystemAndAssert(10);
 		robot.processCommand("r");
-		String expected = "E";
+		robot.processCommand("r");
+		robot.processCommand("r");
+		String expected = "W";
 		assertEquals(expected, robot.getDirection());
 
 	}
