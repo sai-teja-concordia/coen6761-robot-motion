@@ -1,13 +1,11 @@
-package bbear.coen6761.proj.testing;
+package bbear.coen6761.proj;
 
-import bbear.coen6761.proj.RobotDrawing;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-public class Dev11RobotDrawingTest {
+public class QARobotDrawingTest {
 	private RobotDrawing robot = new RobotDrawing();
 	
 	@DisplayName("TC 2 User inputs <i> without defining size of floor")
@@ -175,8 +173,9 @@ public class Dev11RobotDrawingTest {
 		robot.move(4);
 		robot.processCommand("l");
 		robot.move(2);
+		robot.processCommand("r");
 		robot.processCommand("c");
-		String expectedOutput = "Position: 4, 2 - Pen: down - Facing: North\n";
+		String expectedOutput = "Position: 4, 2 - Pen: down - Facing: East\n";
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
 

@@ -1,6 +1,5 @@
-package bbear.coen6761.proj.testing;
+package bbear.coen6761.proj;
 
-import bbear.coen6761.proj.RobotDrawing;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
