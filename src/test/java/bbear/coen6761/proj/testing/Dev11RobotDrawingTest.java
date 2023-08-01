@@ -1,10 +1,10 @@
 package bbear.coen6761.proj.testing;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-
 import bbear.coen6761.proj.RobotDrawing;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class Dev11RobotDrawingTest {
@@ -149,6 +149,7 @@ public class Dev11RobotDrawingTest {
 		robot.processCommand("l");
 		Exception exception = assertThrows(IllegalArgumentException.class , () -> robot.move(4));
 		assertEquals("Robot can't move out of the board!", exception.getMessage());
+		robot.processCommand("p");
 	}
 
 	@DisplayName("TC 15 : Print Robot Position (Pen Up).")

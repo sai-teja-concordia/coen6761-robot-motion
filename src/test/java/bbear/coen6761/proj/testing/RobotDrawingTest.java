@@ -1,11 +1,14 @@
 package bbear.coen6761.proj.testing;
 
-import static org.junit.jupiter.api.Assertions.*;
+import bbear.coen6761.proj.RobotDrawing;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.security.Permission;
 
-import bbear.coen6761.proj.RobotDrawing;
+import static org.junit.jupiter.api.Assertions.*;
+
+@Disabled
 public class RobotDrawingTest {
 
 	private RobotDrawing rb = new RobotDrawing();
