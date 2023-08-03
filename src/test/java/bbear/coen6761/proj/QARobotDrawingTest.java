@@ -189,24 +189,20 @@ public class QARobotDrawingTest {
 		String expectedOutput = "Position: 4, 2 - Pen: down - Facing: East\n";
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
+
+	@DisplayName("Test move method with 0 steps.")
+	@Test
 	public void moveTestStep0() {
 		Exception exception = assertThrows(IllegalArgumentException.class , () -> robot.move(0));
 		assertEquals("Error: please enter a number of steps whose value is not empty or zero.", exception.getMessage());
 		
 	}
-	
+
+	@DisplayName("Test move method with null steps.")
 	@Test
-	public void moveTestStepnull() {
+	public void moveTestStepNull() {
 		Exception exception = assertThrows(IllegalArgumentException.class , () -> robot.move(null));
 		assertEquals("Error: please enter a number of steps whose value is not null.", exception.getMessage());
-		
-	}
-	
-	@Test
-	public void moveTest1() {
-		robot.initializeSystem(10);
-		
-		
 	}
 	
 	private int[] getInitialRobotPosition() {
