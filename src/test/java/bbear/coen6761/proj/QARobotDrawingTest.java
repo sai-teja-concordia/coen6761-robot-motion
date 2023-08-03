@@ -68,26 +68,33 @@ public class QARobotDrawingTest {
 
 	}
 
-	@DisplayName("TC 8 From the Direction North, the User inputs <r> or <R> 3 times. expected direction is West.")
+	@DisplayName("TC 8 The robot should rotate to its right.")
 	@Test
 	public void rotateRightTest() {
 		initializeSystemAndAssert(10);
 		robot.processCommand("r");
+		assertEquals("E", robot.getDirection());
+		robot.processCommand("R");
+		assertEquals("S", robot.getDirection());
 		robot.processCommand("r");
-		robot.processCommand("r");
-		String expected = "W";
-		assertEquals(expected, robot.getDirection());
+		assertEquals("W", robot.getDirection());
+		robot.processCommand("R");
+		assertEquals("N", robot.getDirection());
 
 	}
 
-	@DisplayName("TC 9 From the Direction West, the User inputs <l> or <L> expected direction is South")
+	@DisplayName("TC 9 The robot should rotate to its left.")
 	@Test
 	public void rotateLeftTest() {
 		initializeSystemAndAssert(10);
 		robot.processCommand("l");
+		assertEquals("W", robot.getDirection());
 		robot.processCommand("l");
-		String expected = "S";
-		assertEquals(expected, robot.getDirection());
+		assertEquals("S", robot.getDirection());
+		robot.processCommand("l");
+		assertEquals("E", robot.getDirection());
+		robot.processCommand("l");
+		assertEquals("N", robot.getDirection());
 	}
 
 
@@ -126,7 +133,9 @@ public class QARobotDrawingTest {
 		initializeSystemAndAssert(10);
 		robot.turnRight();
 		robot.processCommand("M 5");
-		assertArrayEquals(new int[]{5,0}, robot.getPosition());
+		robot.printCurrentPosition();
+		String expectedOutput = "Position: 5, 0 - Pen: up - Facing: East\n";
+		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
 
 	@DisplayName("TC 13 : Out of the boundary robot movement")
@@ -160,7 +169,7 @@ public class QARobotDrawingTest {
 		robot.move(4);
 		robot.processCommand("l");
 		robot.move(2);
-		robot.processCommand("c");
+		robot.printCurrentPosition();
 		String expectedOutput = "Position: 4, 2 - Pen: up - Facing: North\n";
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
@@ -176,7 +185,7 @@ public class QARobotDrawingTest {
 		robot.processCommand("l");
 		robot.move(2);
 		robot.processCommand("r");
-		robot.processCommand("c");
+		robot.printCurrentPosition();
 		String expectedOutput = "Position: 4, 2 - Pen: down - Facing: East\n";
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
