@@ -151,6 +151,7 @@ public class QARobotDrawingTest {
 	@Test
 	public void robotOutOfTheBoundaryMovement2() {
 		initializeSystemAndAssert(10);
+		robot.processCommand("D");
 		robot.processCommand("r");
 		robot.move(3);
 		robot.processCommand("l");
