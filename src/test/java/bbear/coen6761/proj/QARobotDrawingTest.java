@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * The following test cases are written by the Dev 11 Team.
+ */
 public class QARobotDrawingTest {
 	private RobotDrawing robot = new RobotDrawing();
 	
