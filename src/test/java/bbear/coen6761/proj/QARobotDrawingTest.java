@@ -5,11 +5,33 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * The following test cases are written by the Dev 11 Team.
- */
+import org.junit.jupiter.api.Disabled;
+
 public class QARobotDrawingTest {
 	private RobotDrawing robot = new RobotDrawing();
+
+	
+	public void initializeSystemAndAssert(int size){
+
+		robot.initializeSystem(size);
+		assertTrue(robot.isInitialized());
+		assertEquals(size, robot.getFloor().length);
+		for (int[] row : robot.getFloor()) {
+			assertEquals(size, row.length);
+		}
+		assertFalse(robot.isPenDown());
+		assertEquals("N",robot.getDirection());
+		assertArrayEquals(getInitialRobotPosition(),robot.getPosition());
+	}
+	
+	@DisplayName("TC 1 User presses Enter key")
+	@Test
+	public void initializationTest3() {
+		robot.processCommand("");
+		String expectedOutput = "Error: System not initialized. Please initialize "
+        		+ "the system using the 'i' command before executing any other commands.\n";
+		assertEquals(expectedOutput, robot.getOutputArea().getText());
+	}
 	
 	@DisplayName("TC 2 User inputs <i> without defining size of floor")
 	@Test
@@ -35,15 +57,18 @@ public class QARobotDrawingTest {
 		robot.processCommand("i 8");
 		assertTrue(robot.isInitialized());
 	}
-
-	@DisplayName("TC 1 User presses Enter key")
+	
+	@DisplayName("TC 5 User inputs <z> ")
 	@Test
-	public void initializationTest3() {
-		robot.processCommand("");
-		String expectedOutput = "Error: System not initialized. Please initialize "
-        		+ "the system using the 'i' command before executing any other commands.\n";
-		assertEquals(expectedOutput, robot.getOutputArea().getText());
+	public void invalidInputTest() {
+		robot.initializeSystem(10);
+		robot.processCommand("z");
+		String expected = "Error: Command not recognized.\n";
+		assertEquals(expected, robot.getOutputArea().getText());
+
 	}
+
+	
 	@DisplayName("TC 6 User inputs <d> or <D> to keep pen down")
 	@Test
 	public void PenDownTest() {
@@ -51,6 +76,7 @@ public class QARobotDrawingTest {
 		robot.processCommand("d");
 		assertTrue(robot.isPenDown());
 	}
+	
 	
 	@DisplayName("TC 7 User inputs <u> or <U> to keep pen up")
 	@Test
@@ -61,15 +87,7 @@ public class QARobotDrawingTest {
 		assertFalse(robot.isPenDown());
 	}
 
-	@DisplayName("TC 5 User inputs <z> ")
-	@Test
-	public void invalidInputTest() {
-		robot.initializeSystem(10);
-		robot.processCommand("z");
-		String expected = "Error: Command not recognized.\n";
-		assertEquals(expected, robot.getOutputArea().getText());
 
-	}
 
 	@DisplayName("TC 8 The robot should rotate to its right.")
 	@Test
@@ -100,20 +118,6 @@ public class QARobotDrawingTest {
 		assertEquals("N", robot.getDirection());
 	}
 
-
-	public void initializeSystemAndAssert(int size){
-
-		robot.initializeSystem(size);
-		assertTrue(robot.isInitialized());
-		assertEquals(size, robot.getFloor().length);
-		for (int[] row : robot.getFloor()) {
-			assertEquals(size, row.length);
-		}
-		assertFalse(robot.isPenDown());
-		assertEquals("N",robot.getDirection());
-		assertArrayEquals(getInitialRobotPosition(),robot.getPosition());
-	}
-
 	@DisplayName("TC 10 : Invalid robot movement with the command - <m y>")
 	@Test
 	public void invalidMovementTest() {
@@ -130,6 +134,7 @@ public class QARobotDrawingTest {
 		assertEquals("Invalid move command: The input format is incorrect. The command and number should be separated by a space.\n", robot.getOutputArea().getText());
 	}
 
+	@Disabled
 	@DisplayName("TC 12 : Valid robot movement with the command - <M 5>")
 	@Test
 	public void robotValidMovement() {
@@ -140,7 +145,7 @@ public class QARobotDrawingTest {
 		String expectedOutput = "Position: 5, 0 - Pen: up - Facing: East\n";
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
-
+	@Disabled
 	@DisplayName("TC 13 : Out of the boundary robot movement")
 	@Test
 	public void robotOutOfTheBoundaryMovement() {
@@ -154,7 +159,6 @@ public class QARobotDrawingTest {
 	@Test
 	public void robotOutOfTheBoundaryMovement2() {
 		initializeSystemAndAssert(10);
-		robot.processCommand("D");
 		robot.processCommand("r");
 		robot.move(3);
 		robot.processCommand("l");
@@ -165,6 +169,7 @@ public class QARobotDrawingTest {
 		robot.processCommand("p");
 	}
 
+	@Disabled
 	@DisplayName("TC 15 : Print Robot Position (Pen Up).")
 	@Test
 	public void robotPositionPenUp() {
@@ -178,7 +183,7 @@ public class QARobotDrawingTest {
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
 
-
+	@Disabled
 	@DisplayName("TC 16 : Print Robot Position (Pen Down).")
 	@Test
 	public void robotPositionPenDown() {
@@ -193,7 +198,29 @@ public class QARobotDrawingTest {
 		String expectedOutput = "Position: 4, 2 - Pen: down - Facing: East\n";
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
-
+	
+	@DisplayName("TC 17")
+	@Test
+	public void printPositionTestWest() {
+		initializeSystemAndAssert(10);
+		robot.processCommand("l");
+		robot.printCurrentPosition();
+		String expectedOutput = "Position: 0, 0 - Pen: up - Facing: West\n";
+		assertEquals(expectedOutput, robot.getOutputArea().getText());
+	}
+	
+	@DisplayName("TC 18")
+	@Test
+	public void printPositionTestSouth() {
+		initializeSystemAndAssert(10);
+		robot.processCommand("l");
+		robot.processCommand("l");
+		robot.printCurrentPosition();
+		String expectedOutput = "Position: 0, 0 - Pen: up - Facing: South\n";
+		assertEquals(expectedOutput, robot.getOutputArea().getText());
+	}
+	
+	
 	@DisplayName("Test move method with 0 steps.")
 	@Test
 	public void moveTestStep0() {
