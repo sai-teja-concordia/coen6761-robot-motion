@@ -199,7 +199,7 @@ public class QARobotDrawingTest {
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
 	
-	@DisplayName("TC 17")
+	@DisplayName("The Robot Position should be correctly printed while facing West Direction")
 	@Test
 	public void printPositionTestWest() {
 		initializeSystemAndAssert(10);
@@ -209,7 +209,7 @@ public class QARobotDrawingTest {
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
 	
-	@DisplayName("TC 18")
+	@DisplayName("The Robot Position should be correctly printed while facing South Direction")
 	@Test
 	public void printPositionTestSouth() {
 		initializeSystemAndAssert(10);
