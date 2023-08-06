@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Disabled;
-
+/**
+ * The following test cases are written by the QA Team.
+ */
 public class QARobotDrawingTest {
 	private RobotDrawing robot = new RobotDrawing();
 
@@ -134,7 +135,6 @@ public class QARobotDrawingTest {
 		assertEquals("Invalid move command: The input format is incorrect. The command and number should be separated by a space.\n", robot.getOutputArea().getText());
 	}
 
-	@Disabled
 	@DisplayName("TC 12 : Valid robot movement with the command - <M 5>")
 	@Test
 	public void robotValidMovement() {
@@ -145,7 +145,7 @@ public class QARobotDrawingTest {
 		String expectedOutput = "Position: 5, 0 - Pen: up - Facing: East\n";
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
-	@Disabled
+
 	@DisplayName("TC 13 : Out of the boundary robot movement")
 	@Test
 	public void robotOutOfTheBoundaryMovement() {
@@ -169,7 +169,7 @@ public class QARobotDrawingTest {
 		robot.processCommand("p");
 	}
 
-	@Disabled
+
 	@DisplayName("TC 15 : Print Robot Position (Pen Up).")
 	@Test
 	public void robotPositionPenUp() {
@@ -183,7 +183,7 @@ public class QARobotDrawingTest {
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
 
-	@Disabled
+
 	@DisplayName("TC 16 : Print Robot Position (Pen Down).")
 	@Test
 	public void robotPositionPenDown() {
