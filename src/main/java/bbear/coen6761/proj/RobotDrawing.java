@@ -1,13 +1,11 @@
 package bbear.coen6761.proj;
 import java.awt.Font;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
 import javax.swing.*;
 
 public class RobotDrawing {
-    private int N; // Size of the floor
+    private int n; // Size of the floor
     private int[][] floor; // The floor array
     private int[] position; // Robot's initial position [row, col]
     private boolean penDown; // Robot's pen status
@@ -19,7 +17,7 @@ public class RobotDrawing {
 
     public static void main(String[] args) {
     	RobotDrawing rd = new RobotDrawing();
-        SwingUtilities.invokeLater(() -> rd.createAndShowGUI());
+        SwingUtilities.invokeLater(rd::createAndShowGUI);
     }
 
     public void createAndShowGUI() {
@@ -110,7 +108,7 @@ public class RobotDrawing {
     
     private void processInitializeCommand(String command) {
 	    String[] parts = command.split(" ");
-	    if (parts[0].toLowerCase().equals("i") && parts.length == 2) {
+	    if (parts[0].equalsIgnoreCase("i") && parts.length == 2) {
 	        try {
 	            int size = Integer.parseInt(parts[1]);
 	            if (size >= 0)
@@ -138,7 +136,7 @@ public class RobotDrawing {
 
 	private void processMoveCommand(String command) {
 		String[] parts = command.split(" ");
-		if (parts[0].toLowerCase().equals("m") && parts.length == 2) {
+		if (parts[0].equalsIgnoreCase("m") && parts.length == 2) {
 			 try {
 	                int steps = Integer.parseInt(parts[1]);
 	                if (steps >= 0){
@@ -156,7 +154,7 @@ public class RobotDrawing {
 			 outputArea.append("Invalid move command: The input format is incorrect. "
                      + "The command and number should be separated by a space.\n");
         }
-    };
+    }
 
 	public void printCurrentPosition() {
 		// Print current position, pen status and direction
@@ -216,7 +214,7 @@ public class RobotDrawing {
 	}
 
 	private void validateFinalPosition(int[] finalPosition) {
-	    if (finalPosition[0] < 0 || finalPosition[0] >= N || finalPosition[1] < 0 || finalPosition[1] >= N) {
+	    if (finalPosition[0] < 0 || finalPosition[0] >= n || finalPosition[1] < 0 || finalPosition[1] >= n) {
 	        throw new IllegalArgumentException("Robot can't move out of the board!");
 	    }
 	}
@@ -264,9 +262,9 @@ public class RobotDrawing {
     public void printFloor(JTextArea outputArea) {
     	 StringBuilder sb = new StringBuilder();
     	    // Start from the last row to flip the vertical axis
-    	    for (int i = N - 1; i >= 0; i--) {
+    	    for (int i = n - 1; i >= 0; i--) {
     	        sb.append(i).append(" "); // Print row index
-    	        for (int j = 0; j < N; j++) {
+    	        for (int j = 0; j < n; j++) {
     	            if (floor[i][j] == 1) {
     	                sb.append("* ");
     	            } else {
@@ -277,7 +275,7 @@ public class RobotDrawing {
     	    }
     	    // Print column indexes(last line)
     	    sb.append("  "); // Offset for row indexes
-    	    for (int i = 0; i < N; i++) {
+    	    for (int i = 0; i < n; i++) {
     	        sb.append(i).append(" ");
     	    }
     	    sb.append("\n");
@@ -293,10 +291,10 @@ public class RobotDrawing {
     	}
     	
         // Initialize size of the floor
-        N = size;
+        n = size;
 
         // Initialize the floor array
-        floor = new int[N][N];
+        floor = new int[n][n];
 
         // Initialize robot's position
         position = new int[] {0, 0};
@@ -313,7 +311,7 @@ public class RobotDrawing {
     }
 
 	public int getN() {
-		return N;
+		return n;
 	}
 
 	public int[][] getFloor() {
