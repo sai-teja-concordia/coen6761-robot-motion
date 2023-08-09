@@ -125,7 +125,7 @@ public class RobotDrawingTest {
     	rb.processCommand("m 2");	
     	rb.processCommand("C");
          // setting the outputArea
-    	String expectedOutput = "Position: 0, 2 - Pen: up - Facing: East\n";
+    	String expectedOutput = "Position: 2, 0 - Pen: up - Facing: East\n";
     	assertEquals(expectedOutput, getLastMessageFromOutputArea());
     	
     	rb.processCommand("c");
