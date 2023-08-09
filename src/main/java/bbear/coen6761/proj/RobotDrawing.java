@@ -1,4 +1,5 @@
 package bbear.coen6761.proj;
+import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -28,9 +29,10 @@ public class RobotDrawing {
         
 //        outputArea = new JTextArea(20, 50);
         outputArea.setEditable(false);
+        // Set the font to monospaced
+        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         JScrollPane scrollPane = new JScrollPane(outputArea);
         mainPanel.add(scrollPane);
-
         JTextField inputField = new JTextField(50);
         inputField.addActionListener(e -> {
             String command = inputField.getText();
@@ -167,7 +169,7 @@ public class RobotDrawing {
 		    default:
 		        directionFull = "Invalid Direction";
 		}
-		String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[0], position[1], 
+		String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[1], position[0], 
 				penStatus,directionFull);
 		outputArea.append(formattedPosition + "\n");
 	}
@@ -256,7 +258,7 @@ public class RobotDrawing {
     	        }
     	        sb.append("\n");
     	    }
-    	    // Print column indexes
+    	    // Print column indexes(last line)
     	    sb.append("  "); // Offset for row indexes
     	    for (int i = 0; i < N; i++) {
     	        sb.append(i).append(" ");
@@ -264,7 +266,7 @@ public class RobotDrawing {
     	    sb.append("\n");
     	    outputArea.append(sb.toString());
     }
-    
+
     public void initializeSystem(Integer size) {
     	if (size == null) {
 	        throw new IllegalArgumentException("Error: please enter a size whose value is not null.");

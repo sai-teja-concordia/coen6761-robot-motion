@@ -1,12 +1,12 @@
-# Created at 2023-07-23T00:09:49.248
+# Created at 2023-07-27T23:37:36.587
 WARNING: A terminally deprecated method in java.lang.System has been called
 
-# Created at 2023-07-23T00:09:49.249
+# Created at 2023-07-27T23:37:36.588
 WARNING: System::setSecurityManager has been called by bbear.coen6761.proj.testing.RobotDrawingTest (file:/C:/Code/coen6761/robot-motion1/proj/target/test-classes/)
 
-# Created at 2023-07-23T00:09:49.250
+# Created at 2023-07-27T23:37:36.589
 WARNING: Please consider reporting this to the maintainers of bbear.coen6761.proj.testing.RobotDrawingTest
 
-# Created at 2023-07-23T00:09:49.251
+# Created at 2023-07-27T23:37:36.589
 WARNING: System::setSecurityManager will be removed in a future release
 
