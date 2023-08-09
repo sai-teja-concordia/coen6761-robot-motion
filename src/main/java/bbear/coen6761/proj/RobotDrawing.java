@@ -81,7 +81,7 @@ public class RobotDrawing {
 		else if (command.toLowerCase().equals("l")) {
 			turnLeft();
 		}
-//	    "m  3" => [m,"",3]
+
 		else if (command.toLowerCase().startsWith("m")) {
 			String[] parts = command.split(" ");
 			if (parts[0].toLowerCase().equals("m") && parts.length == 2) {
@@ -183,14 +183,30 @@ public class RobotDrawing {
 			throw new IllegalArgumentException("Error: please enter a number of steps whose value is not empty or zero.");
 		}
 		
+		// Calculate the final position after the steps
+		int[] finalPosition = new int[]{position[0], position[1]};
+		if (direction.equals("N")) {
+			finalPosition[0] += steps;
+		} else if (direction.equals("S")) {
+			finalPosition[0] -= steps;
+		} else if (direction.equals("W")) {
+			finalPosition[1] -= steps;
+		} else if (direction.equals("E")) {
+			finalPosition[1] += steps;
+		}
+
+		// Check if the final position is within the board
+		if (finalPosition[0] < 0 || finalPosition[0] >= N || finalPosition[1] < 0 || finalPosition[1] >= N) {
+			throw new IllegalArgumentException("Robot can't move out of the board!");
+		}
+		
+		
+        if (penDown) {
+            floor[position[0]][position[1]] = 1; // current position
+        }
 	    for (int i = 0; i < steps; i++) {
 	        // Store next position
 	        int[] nextPosition = new int[]{position[0], position[1]};
-	        
-	        if (firstMove && penDown) {
-	             floor[position[0]][position[1]] = 1; 
-	             firstMove = false; // Reset the flag
-	        }
 	        
 	        if (direction.equals("N")) {
 	            nextPosition[0]++;
@@ -200,11 +216,6 @@ public class RobotDrawing {
 	            nextPosition[1]--;
 	        } else if (direction.equals("E")) {
 	            nextPosition[1]++;
-	        }
-
-	        // Check if next position is valid
-	        if (nextPosition[0] < 0 || nextPosition[0] >= N || nextPosition[1] < 0 || nextPosition[1] >= N) {
-	            throw new IllegalArgumentException("Robot can't move out of the board!");
 	        }
 
 	        // Update position
@@ -319,8 +330,13 @@ public class RobotDrawing {
 		return firstMove;
 	}
 	
+	// : set the pen down and mark the current position
 	public void setPenDown(boolean penDown) {
 		this.penDown = penDown;
+		if (penDown) {
+			// If the pen is being set down, mark the current position on the floor
+			floor[position[0]][position[1]] = 1;
+		}
 	}
 
 	public JTextArea getOutputArea() {
