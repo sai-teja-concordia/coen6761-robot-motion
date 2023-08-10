@@ -1,11 +1,11 @@
 package bbear.coen6761.proj;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
 
 public class RobotDrawing {
-    private int N; // Size of the floor
+    private int n; // Size of the floor
     private int[][] floor; // The floor array
     private int[] position; // Robot's initial position [row, col]
     private boolean penDown; // Robot's pen status
@@ -17,7 +17,7 @@ public class RobotDrawing {
 
     public static void main(String[] args) {
     	RobotDrawing rd = new RobotDrawing();
-        SwingUtilities.invokeLater(() -> rd.createAndShowGUI());
+        SwingUtilities.invokeLater(rd::createAndShowGUI);
     }
 
     public void createAndShowGUI() {
@@ -26,18 +26,17 @@ public class RobotDrawing {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         
-//        outputArea = new JTextArea(20, 50);
         outputArea.setEditable(false);
+        // Set the font to monospaced
+        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         JScrollPane scrollPane = new JScrollPane(outputArea);
         mainPanel.add(scrollPane);
-
         JTextField inputField = new JTextField(50);
         inputField.addActionListener(e -> {
             String command = inputField.getText();
             outputArea.append("CMD: "+command + "\n");
             processCommand(command);
             inputField.setText("");
-//            printFloor(outputArea);
         });
         mainPanel.add(inputField);
 
@@ -49,103 +48,113 @@ public class RobotDrawing {
     public void processCommand(String command) {
     	//outputArea.append("-----"+command+"----");
     	if (command == null) {
-    		outputArea.append("Error: please enter a command whose value is not null.\n");
+    		outputError("Error: please enter a command whose value is not null.\n");
             return;
         }
+		if (command.trim().isEmpty()) {
+			//in case is empty
+			outputError("Error: please enter a command whose value is not empty.\n");
+			return;
+		}
+		
+    	String cmd = command.toLowerCase().trim();
+    	
         // Check if the command is 'q' first, regardless of system initialization status
-        if (command.toLowerCase().equals("q")) {
+        if (cmd.equals("q")) {
             // stop the program
             shutdown();
             return;
         }
-    	if (!initialized && !command.toLowerCase().startsWith("i")) {
-            outputArea.append("Error: System not initialized. Please initialize "
+    	if (!initialized && !cmd.startsWith("i")) {
+    		outputError("Error: System not initialized. Please initialize "
             		+ "the system using the 'i' command before executing any other commands.\n");
             return;
         }
     	// An error message indicating the command does not accept additional characters or numbers.
-        if (command.toLowerCase().matches("^[udrlpcq].+")) {
-            outputArea.append("Error: Command does not accept additional characters or numbers.\n");
+        if (cmd.matches("^[udrlpcq].+")) {
+        	outputError("Error: Command does not accept additional characters or numbers.\n");
             return;
         }
-	    if (command.toLowerCase().equals("u")) {
-	    	setPenDown(false);
+        
+        switch(cmd.charAt(0)) {
+        	case 'u':
+        		setPenDown(false);
+        		break;
+        	case 'd':
+        		setPenDown(true);
+        		break;
+        	case 'r':
+        		turnRight();
+        		break;
+        	case 'l':
+        		turnLeft();
+        		break;
+        	case 'm':
+        		processMoveCommand(cmd);
+        		break;
+        	case 'p':
+        		printFloor(outputArea);
+        		break;
+            case 'c':
+                printCurrentPosition();
+                break;
+            case 'i':
+                processInitializeCommand(cmd);
+                break;
+            default:
+            	outputError("Error: Command not recognized.\n");
+                break;
+        }
+    }
+    
+    private void processInitializeCommand(String command) {
+	    String[] parts = command.split(" ");
+	    if (parts[0].equalsIgnoreCase("i") && parts.length == 2) {
+	        try {
+	            int size = Integer.parseInt(parts[1]);
+	            if (size >= 0)
+                {
+	            	initializeSystem(size);
+                }
+                else
+                {
+                	outputError("The size of the array must be a positive number\n");
+                }
+	        } catch (NumberFormatException nfe) {
+	        	outputError("The input format is not a number\n");
+	        } catch (IllegalArgumentException e) {
+	        	outputError(e.getMessage() + "\n");
+            }
+	    } else {
+	    	outputError("Invalid initialize command: The input format is incorrect. "
+                     + "The command and number should be separated by a space.\n");
 	    }
-	    else if (command.toLowerCase().equals("d")) {
-	    	setPenDown(true);
-	    }
-		else if (command.toLowerCase().equals("r")) {
-			turnRight();
-		}
-		else if (command.toLowerCase().equals("l")) {
-			turnLeft();
-		}
-//	    "m  3" => [m,"",3]
-		else if (command.toLowerCase().startsWith("m")) {
-			String[] parts = command.split(" ");
-			if (parts[0].toLowerCase().equals("m") && parts.length == 2) {
-				 try {
-		                int steps = Integer.parseInt(parts[1]);
-		                if (steps >= 0)
-		                {
-		                	move(steps);
-		                }
-		                else
-		                {
-		                	outputArea.append("The number of steps must be a positive number\n");
-		                }
-		            } catch (NumberFormatException nfe) {
-		                //System.err.println("Exception: " + nfe.getMessage());
-		            	outputArea.append("The input format is not a number\n");
-		            } catch (IllegalArgumentException e) {
-		                outputArea.append(e.getMessage() + "\n");
-		          }
-			} else {
-				 outputArea.append("Invalid move command: The input format is incorrect. "
-                         + "The command and number should be separated by a space.\n");
-	        }
-		}
-		else if (command.toLowerCase().equals("p")) {
-            printFloor(outputArea);
-		}
-		else if (command.toLowerCase().equals("c")) {
-	        printCurrentPosition();
-		}
-		else if (command.toLowerCase().startsWith("i")) {
-		    String[] parts = command.split(" ");
-		    if (parts[0].toLowerCase().equals("i") && parts.length == 2) {
-		        try {
-		            // n is the size of the array
-		            int size = Integer.parseInt(parts[1]);
-		            if (size >= 0)
-	                {
-		            	initializeSystem(size);
+	}
+    
+    private void outputError(String message) {
+        outputArea.append(message);
+    }
+
+	private void processMoveCommand(String command) {
+		String[] parts = command.split(" ");
+		if (parts[0].equalsIgnoreCase("m") && parts.length == 2) {
+			 try {
+	                int steps = Integer.parseInt(parts[1]);
+	                if (steps >= 0){
+	                	move(steps);
 	                }
-	                else
-	                {
-	                	outputArea.append("The size of the array must be a positive number\n");
+	                else{
+	                	outputArea.append("The number of steps must be a positive number\n");
 	                }
-		        } catch (NumberFormatException nfe) {
-		            //System.err.println("Exception: " + e.getMessage());
-		        	outputArea.append("The input format is not a number\n");
-		        } catch (IllegalArgumentException e) {
+	            } catch (NumberFormatException nfe) {
+	            	outputArea.append("The input format is not a number\n");
+	            } catch (IllegalArgumentException e) {
 	                outputArea.append(e.getMessage() + "\n");
-	            }
-		    } else {
-		    	 outputArea.append("Invalid initialize command: The input format is incorrect. "
-                         + "The command and number should be separated by a space.\n");
-		    }
-		}
-		else if (command.trim().isEmpty())
-		{
-			//in case is empty
-			outputArea.append("Error: please enter a command whose value is not empty.\n");
-		}
-	    // Handle commands that start with an unexpected character
-	    else if (!command.toLowerCase().matches("^[udrlmpcqi].*")) {
-	        outputArea.append("Error: Command not recognized.\n");
-	        return;
-	    }
+	          }
+		} else {
+			 outputArea.append("Invalid move command: The input format is incorrect. "
+                     + "The command and number should be separated by a space.\n");
+        }
     }
 
 	public void printCurrentPosition() {
@@ -168,53 +177,61 @@ public class RobotDrawing {
 		    default:
 		        directionFull = "Invalid Direction";
 		}
-		String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[0], position[1], 
+		String formattedPosition = String.format("Position: %d, %d - Pen: %s - Facing: %s", position[1], position[0], 
 				penStatus,directionFull);
 		outputArea.append(formattedPosition + "\n");
 	}
 
-    // Move the robot forward a given number of steps
+	// Move the robot forward a given number of steps
 	public void move(Integer steps) throws IllegalArgumentException {
-		if (steps == null) {
-	        throw new IllegalArgumentException("Error: please enter a number of steps whose value is not null.");
-	    }
-		else if (steps == 0) {
-			throw new IllegalArgumentException("Error: please enter a number of steps whose value is not empty or zero.");
-		}
-		
+	    validateSteps(steps);
+
+	    int[] finalPosition = calculateFinalPosition(steps);
+	    validateFinalPosition(finalPosition);
+
 	    for (int i = 0; i < steps; i++) {
-	        // Store next position
-	        int[] nextPosition = new int[]{position[0], position[1]};
-	        
-	        if (firstMove && penDown) {
-	             floor[position[0]][position[1]] = 1; 
-	             firstMove = false; // Reset the flag
-	        }
-	        
-	        if (direction.equals("N")) {
-	            nextPosition[0]++;
-	        } else if (direction.equals("S")) {
-	            nextPosition[0]--;
-	        } else if (direction.equals("W")) {
-	            nextPosition[1]--;
-	        } else if (direction.equals("E")) {
-	            nextPosition[1]++;
-	        }
-
-	        // Check if next position is valid
-	        if (nextPosition[0] < 0 || nextPosition[0] >= N || nextPosition[1] < 0 || nextPosition[1] >= N) {
-	            throw new IllegalArgumentException("Robot can't move out of the board!");
-	        }
-
-	        // Update position
-	        position = nextPosition;
-
-	        if (penDown) {
-	            floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
-	        }
+	        moveOneStep();
 	    }
 	}
 
+	private void validateSteps(Integer steps) {
+	    if (steps == null) {
+	        throw new IllegalArgumentException("Error: please enter a number of steps whose value is not null.");
+	    } else if (steps == 0) {
+	        throw new IllegalArgumentException("Error: please enter a number of steps whose value is not empty or zero.");
+	    }
+	}
+
+	private int[] calculateFinalPosition(int steps) {
+	    int[] finalPosition = Arrays.copyOf(position, position.length);
+	    switch (direction) {
+	        case "N": finalPosition[0] += steps; break;
+	        case "S": finalPosition[0] -= steps; break;
+	        case "W": finalPosition[1] -= steps; break;
+	        case "E": finalPosition[1] += steps; break;
+	        default:break;
+	    }
+	    return finalPosition;
+	}
+
+	private void validateFinalPosition(int[] finalPosition) {
+	    if (finalPosition[0] < 0 || finalPosition[0] >= n || finalPosition[1] < 0 || finalPosition[1] >= n) {
+	        throw new IllegalArgumentException("Robot can't move out of the board!");
+	    }
+	}
+
+	private void moveOneStep() {
+	    switch (direction) {
+	        case "N": position[0]++; break;
+	        case "S": position[0]--; break;
+	        case "W": position[1]--; break;
+	        case "E": position[1]++; break;
+	        default:break;
+	    }
+	    if (penDown) {
+	        floor[position[0]][position[1]] = 1; // Mark the floor with an asterisk
+	    }
+	}
 
     // Turn the robot 90 degrees to the right
     public void turnRight() {
@@ -246,9 +263,9 @@ public class RobotDrawing {
     public void printFloor(JTextArea outputArea) {
     	 StringBuilder sb = new StringBuilder();
     	    // Start from the last row to flip the vertical axis
-    	    for (int i = N - 1; i >= 0; i--) {
+    	    for (int i = n - 1; i >= 0; i--) {
     	        sb.append(i).append(" "); // Print row index
-    	        for (int j = 0; j < N; j++) {
+    	        for (int j = 0; j < n; j++) {
     	            if (floor[i][j] == 1) {
     	                sb.append("* ");
     	            } else {
@@ -257,15 +274,15 @@ public class RobotDrawing {
     	        }
     	        sb.append("\n");
     	    }
-    	    // Print column indexes
+    	    // Print column indexes(last line)
     	    sb.append("  "); // Offset for row indexes
-    	    for (int i = 0; i < N; i++) {
+    	    for (int i = 0; i < n; i++) {
     	        sb.append(i).append(" ");
     	    }
     	    sb.append("\n");
     	    outputArea.append(sb.toString());
     }
-    
+
     public void initializeSystem(Integer size) {
     	if (size == null) {
 	        throw new IllegalArgumentException("Error: please enter a size whose value is not null.");
@@ -275,10 +292,10 @@ public class RobotDrawing {
     	}
     	
         // Initialize size of the floor
-        N = size;
+        n = size;
 
         // Initialize the floor array
-        floor = new int[N][N];
+        floor = new int[n][n];
 
         // Initialize robot's position
         position = new int[] {0, 0};
@@ -295,7 +312,7 @@ public class RobotDrawing {
     }
 
 	public int getN() {
-		return N;
+		return n;
 	}
 
 	public int[][] getFloor() {
@@ -318,8 +335,13 @@ public class RobotDrawing {
 		return firstMove;
 	}
 	
+	// : set the pen down and mark the current position
 	public void setPenDown(boolean penDown) {
 		this.penDown = penDown;
+		if (penDown) {
+			// If the pen is being set down, mark the current position on the floor
+			floor[position[0]][position[1]] = 1;
+		}
 	}
 
 	public JTextArea getOutputArea() {
