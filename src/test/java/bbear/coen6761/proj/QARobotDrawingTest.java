@@ -29,8 +29,7 @@ public class QARobotDrawingTest {
 	@Test
 	public void initializationTest3() {
 		robot.processCommand("");
-		String expectedOutput = "Error: System not initialized. Please initialize "
-        		+ "the system using the 'i' command before executing any other commands.\n";
+		String expectedOutput = "Error: please enter a command whose value is not empty.\n";
 		assertEquals(expectedOutput, robot.getOutputArea().getText());
 	}
 	
